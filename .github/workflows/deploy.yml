@@ -1,0 +1,49 @@
+name: Deploy SKPI ke Hostinger
+
+on:
+  push:
+    branches:
+      - main # Akan berjalan otomatis setiap ada 'git push' ke branch main
+
+jobs:
+  build-and-deploy:
+    name: Build React & Deploy to Hostinger
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Kode
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install & Build Frontend
+        working-directory: ./frontend
+        run: |
+          npm install
+          npm run build
+
+      - name: Siapkan Folder Deployment
+        run: |
+          # Buat folder khusus bernama 'deploy_ready' untuk dikirim ke FTP
+          mkdir deploy_ready
+          # Pindahkan isi folder hasil build React ke dalam deploy_ready (menjadi file utama)
+          cp -R frontend/dist/* deploy_ready/
+          # Pindahkan folder backend ke dalam deploy_ready
+          cp -R backend deploy_ready/
+
+      - name: Upload ke Hostinger via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./deploy_ready/
+          server-dir: ./public_html/
+          # Mengabaikan file yang tidak perlu dikirim
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**

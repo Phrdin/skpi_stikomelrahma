@@ -124,7 +124,7 @@ const Login = () => {
             </div>
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 text-white text-sm font-semibold backdrop-blur-sm shadow-sm">
               <span className="bg-white text-blue-600 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">SKPI</span>
-              <span>El Rahma Bogor</span>
+              <span>STIKOM El Rahma Bogor</span>
             </div>
           </div>
 
