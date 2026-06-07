@@ -130,7 +130,7 @@ const Login = () => {
 
           <h1 className="text-4xl xl:text-5xl font-bold text-white mb-6 leading-tight">
             SKPI <br />
-            <span className="text-yellow-400">STIKOM El Rahma</span>
+            <span className="text-yellow-400">STIKOM El Rahma Bogor</span>
           </h1>
 
           <p className="text-blue-100 text-lg mb-12 max-w-lg leading-relaxed">
