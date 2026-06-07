@@ -1,0 +1,13 @@
+# Dependencies
+frontend/node_modules/
+
+# Build output
+# frontend/dist/ (Dibiarkan agar bisa langsung deploy dari github jika butuh)
+
+# Temporary files
+.DS_Store
+Thumbs.db
+.vscode/
+
+# AI Scratch files
+scratch/
