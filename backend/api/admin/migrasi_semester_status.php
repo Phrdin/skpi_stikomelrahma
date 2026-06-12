@@ -2,7 +2,6 @@
 require '../../konfigurasi/database.php';
 
 try {
-    $pdo->beginTransaction();
 
     // 1. Create master_status_mahasiswa
     $pdo->exec("CREATE TABLE IF NOT EXISTS master_status_mahasiswa (
@@ -62,7 +61,6 @@ try {
         $pdo->exec("ALTER TABLE mahasiswa DROP COLUMN status_mahasiswa");
     }
 
-    $pdo->commit();
     echo "Migrasi berhasil dieksekusi.";
 
 } catch (Exception $e) {
