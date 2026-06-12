@@ -1,7 +1,7 @@
 <?php
 $host = 'localhost';
-$db   = 'db_skpi'; // Di hostinger biasanya ada awalan, misal u123456_db_skpi
-$user = 'db_skpi'; // Di hostinger biasanya ada awalan, misal u123456_db_skpi
+$db   = 'u394821574_db_skpi'; // Di hostinger biasanya ada awalan, misal u123456_db_skpi
+$user = 'u394821574_db_skpi'; // Di hostinger biasanya ada awalan, misal u123456_db_skpi
 $pass = 'SKPI_stikom*123'; 
 
 try {
