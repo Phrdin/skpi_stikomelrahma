@@ -12,6 +12,16 @@ const Pengaturan = () => {
   const { pengguna } = useContext(KonteksPengguna);
   const [tabAktif, setTabAktif] = useState('akademik');
 
+  // --- STATE STATUS MAHASISWA ---
+  const [dataStatus, setDataStatus] = useState([]);
+  const [showModalStatus, setShowModalStatus] = useState(false);
+  const [formStatus, setFormStatus] = useState({ id_status: '', nama_status: '', deskripsi: '', izin_akses_skpi: 1 });
+
+  // --- STATE PERIODE ---
+  const [dataPeriode, setDataPeriode] = useState([]);
+  const [showModalPeriode, setShowModalPeriode] = useState(false);
+  const [formPeriode, setFormPeriode] = useState({ id_periode: '', nama_periode: '', tanggal_mulai: '', tanggal_selesai: '', is_aktif: 0 });
+
   // --- STATE AKADEMIK & ANGKATAN ---
   const [dataPoin, setDataPoin] = useState([]);
   const [daftarAngkatan, setDaftarAngkatan] = useState([]);
@@ -53,6 +63,22 @@ const Pengaturan = () => {
       const hasil = await res.json();
       if (hasil.status === 'sukses') setDataPoin(hasil.data.map(d => ({ sem: d.semester, min: d.target_poin, id: d.id })));
     } catch (err) { console.error("Gagal ambil data semester"); }
+  };
+
+  const ambilStatus = async () => {
+    try {
+      const res = await fetch('https://skpi-stikomelrahma.my.id/backend/api/admin/kelola_status.php?aksi=ambil');
+      const hasil = await res.json();
+      if (hasil.status === 'sukses') setDataStatus(hasil.data);
+    } catch (err) { console.error("Gagal ambil data status"); }
+  };
+
+  const ambilPeriode = async () => {
+    try {
+      const res = await fetch('https://skpi-stikomelrahma.my.id/backend/api/admin/pengaturan_periode.php?aksi=ambil');
+      const hasil = await res.json();
+      if (hasil.status === 'sukses') setDataPeriode(hasil.data);
+    } catch (err) { console.error("Gagal ambil data periode"); }
   };
 
   const ambilPengaturanSKPI = async () => {
@@ -160,7 +186,7 @@ const Pengaturan = () => {
     finally { setLoadingSKPI(false); }
   };
 
-  useEffect(() => { ambilAngkatan(); ambilSemester(); ambilPengaturanSKPI(); }, []);
+  useEffect(() => { ambilAngkatan(); ambilSemester(); ambilPengaturanSKPI(); ambilStatus(); ambilPeriode(); }, []);
 
   return (
     <div className="animate-in fade-in duration-500 pb-20">
@@ -173,6 +199,8 @@ const Pengaturan = () => {
 
       <div className="flex bg-white p-2 rounded-[2rem] shadow-sm border mb-10 overflow-x-auto no-scrollbar gap-2">
         <TabButton aktif={tabAktif === 'akademik'} onClick={() => setTabAktif('akademik')} ikon={<GraduationCap size={18} />} label="Akademik & Angkatan" />
+        <TabButton aktif={tabAktif === 'status'} onClick={() => setTabAktif('status')} ikon={<Users size={18} />} label="Status Mahasiswa" />
+        <TabButton aktif={tabAktif === 'periode'} onClick={() => setTabAktif('periode')} ikon={<Calendar size={18} />} label="Periode Sinkronisasi" />
         <TabButton aktif={tabAktif === 'skpi'} onClick={() => setTabAktif('skpi')} ikon={<FileText size={18} />} label="SKPI Resmi" />
         <TabButton aktif={tabAktif === 'keamanan'} onClick={() => setTabAktif('keamanan')} ikon={<Lock size={18} />} label="Ganti Password" />
       </div>
@@ -212,6 +240,38 @@ const Pengaturan = () => {
             loading={loadingSKPI}
           />
         )}
+        {tabAktif === 'status' && (
+          <PanelStatus 
+            dataStatus={dataStatus} 
+            bukaEdit={(data) => { setFormStatus(data); setShowModalStatus(true); }}
+            setFormStatus={setFormStatus}
+            setShowModalStatus={setShowModalStatus}
+            handleHapus={async (id) => {
+              const konfirmasi = await Swal.fire({ title: 'Hapus Status?', text: "Data akan dihapus!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#9ca3af', confirmButtonText: 'Ya, Hapus!' });
+              if (!konfirmasi.isConfirmed) return;
+              const res = await fetch(`https://skpi-stikomelrahma.my.id/backend/api/admin/kelola_status.php?aksi=hapus`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_status: id }) });
+              if ((await res.json()).status === 'sukses') { Swal.fire('Dihapus!', '', 'success'); ambilStatus(); }
+            }}
+          />
+        )}
+        {tabAktif === 'periode' && (
+          <PanelPeriode 
+            dataPeriode={dataPeriode} 
+            bukaEdit={(data) => { setFormPeriode(data); setShowModalPeriode(true); }}
+            setFormPeriode={setFormPeriode}
+            setShowModalPeriode={setShowModalPeriode}
+            handleHapus={async (id) => {
+              const konfirmasi = await Swal.fire({ title: 'Hapus Periode?', text: "Data akan dihapus!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#9ca3af', confirmButtonText: 'Ya, Hapus!' });
+              if (!konfirmasi.isConfirmed) return;
+              const res = await fetch(`https://skpi-stikomelrahma.my.id/backend/api/admin/pengaturan_periode.php?aksi=hapus`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_periode: id }) });
+              if ((await res.json()).status === 'sukses') { Swal.fire('Dihapus!', '', 'success'); ambilPeriode(); }
+            }}
+            handleSetAktif={async (id) => {
+              const res = await fetch(`https://skpi-stikomelrahma.my.id/backend/api/admin/pengaturan_periode.php?aksi=set_aktif`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_periode: id }) });
+              if ((await res.json()).status === 'sukses') { Swal.fire('Diperbarui!', '', 'success'); ambilPeriode(); }
+            }}
+          />
+        )}
         {tabAktif === 'keamanan' && (
           <PanelKeamanan pengguna={pengguna} />
         )}
@@ -235,6 +295,64 @@ const Pengaturan = () => {
                     body: JSON.stringify(dataEdit)
                   });
                   if ((await res.json()).status === 'sukses') { setShowEditModal(false); ambilAngkatan(); Swal.fire(dataEdit.id ? 'Diperbarui!' : 'Ditambahkan!', '', 'success'); }
+                }} className="w-2/3 bg-blue-600 text-white py-5 rounded-3xl font-black uppercase">Simpan</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL STATUS MAHASISWA */}
+      {showModalStatus && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in">
+          <div className="bg-white p-8 rounded-[3rem] w-full max-w-md shadow-2xl scale-in-center">
+            <h3 className="font-black text-blue-900 text-xl uppercase mb-6">{formStatus.id_status ? 'Edit Status' : 'Tambah Status'}</h3>
+            <div className="space-y-4">
+              <InputGroup label="Nama Status" value={formStatus.nama_status} onChange={e => setFormStatus({ ...formStatus, nama_status: e.target.value })} />
+              <InputGroup label="Deskripsi" value={formStatus.deskripsi} onChange={e => setFormStatus({ ...formStatus, deskripsi: e.target.value })} />
+              <div className="text-left space-y-2">
+                <label className="text-[9px] font-black text-gray-400 uppercase ml-2 tracking-widest">Izin Akses SKPI</label>
+                <select className="w-full p-4 bg-gray-50 rounded-2xl font-bold text-xs outline-none focus:ring-2 focus:ring-blue-600 shadow-inner" value={formStatus.izin_akses_skpi} onChange={e => setFormStatus({...formStatus, izin_akses_skpi: e.target.value})}>
+                  <option value={1}>Diizinkan</option>
+                  <option value={0}>Tidak Diizinkan</option>
+                </select>
+              </div>
+              <div className="flex gap-3 pt-4">
+                <button onClick={() => setShowModalStatus(false)} className="w-1/3 bg-gray-100 text-gray-600 py-5 rounded-3xl font-black uppercase">Batal</button>
+                <button onClick={async () => {
+                  const aksi = formStatus.id_status ? 'edit' : 'tambah';
+                  const res = await fetch(`https://skpi-stikomelrahma.my.id/backend/api/admin/kelola_status.php?aksi=${aksi}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formStatus)
+                  });
+                  if ((await res.json()).status === 'sukses') { setShowModalStatus(false); ambilStatus(); Swal.fire('Tersimpan!', '', 'success'); }
+                }} className="w-2/3 bg-blue-600 text-white py-5 rounded-3xl font-black uppercase">Simpan</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL PERIODE */}
+      {showModalPeriode && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in">
+          <div className="bg-white p-8 rounded-[3rem] w-full max-w-md shadow-2xl scale-in-center">
+            <h3 className="font-black text-blue-900 text-xl uppercase mb-6">{formPeriode.id_periode ? 'Edit Periode' : 'Tambah Periode'}</h3>
+            <div className="space-y-4">
+              <InputGroup label="Nama Periode" value={formPeriode.nama_periode} onChange={e => setFormPeriode({ ...formPeriode, nama_periode: e.target.value })} />
+              <InputGroup label="Tanggal Mulai (MM-DD)" value={formPeriode.tanggal_mulai} onChange={e => setFormPeriode({ ...formPeriode, tanggal_mulai: e.target.value })} />
+              <InputGroup label="Tanggal Selesai (MM-DD)" value={formPeriode.tanggal_selesai} onChange={e => setFormPeriode({ ...formPeriode, tanggal_selesai: e.target.value })} />
+              <div className="flex gap-3 pt-4">
+                <button onClick={() => setShowModalPeriode(false)} className="w-1/3 bg-gray-100 text-gray-600 py-5 rounded-3xl font-black uppercase">Batal</button>
+                <button onClick={async () => {
+                  const aksi = formPeriode.id_periode ? 'edit' : 'tambah';
+                  const res = await fetch(`https://skpi-stikomelrahma.my.id/backend/api/admin/pengaturan_periode.php?aksi=${aksi}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formPeriode)
+                  });
+                  if ((await res.json()).status === 'sukses') { setShowModalPeriode(false); ambilPeriode(); Swal.fire('Tersimpan!', '', 'success'); }
                 }} className="w-2/3 bg-blue-600 text-white py-5 rounded-3xl font-black uppercase">Simpan</button>
               </div>
             </div>
@@ -283,6 +401,67 @@ const PanelAkademik = ({ dataPoin, daftarAngkatan, bukaEdit, setDataEdit, setSho
         ))}
       </div>
       <button onClick={onSaveSemester} className="w-full bg-emerald-600 text-white py-4 rounded-2xl font-black text-[10px] uppercase flex items-center justify-center gap-2"><Save size={16} /> Simpan Target</button>
+    </div>
+  </div>
+);
+
+const PanelStatus = ({ dataStatus, bukaEdit, setFormStatus, setShowModalStatus, handleHapus }) => (
+  <div className="bg-white p-8 md:p-10 rounded-[3rem] shadow-sm border border-gray-100 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-4xl mx-auto">
+    <div className="flex justify-between items-center mb-6">
+      <h4 className="font-black text-blue-900 uppercase italic flex items-center gap-3"><Users className="text-blue-600" /> Master Status Mahasiswa</h4>
+      <button onClick={() => { setFormStatus({ id_status: '', nama_status: '', deskripsi: '', izin_akses_skpi: 1 }); setShowModalStatus(true); }} className="bg-blue-100 text-blue-700 px-4 py-2 rounded-xl font-black text-[10px] uppercase hover:bg-blue-600 hover:text-white transition-colors">
+        + Tambah
+      </button>
+    </div>
+    <div className="space-y-3">
+      {dataStatus.map(st => (
+        <div key={st.id_status} className="flex flex-col md:flex-row justify-between items-start md:items-center p-5 bg-gray-50 rounded-3xl border border-gray-100 gap-4">
+          <div>
+            <div className="flex items-center gap-3">
+              <p className="font-black text-blue-900 text-sm uppercase">{st.nama_status}</p>
+              <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase ${st.izin_akses_skpi == 1 ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
+                {st.izin_akses_skpi == 1 ? 'Diizinkan Akses SKPI' : 'Akses SKPI Ditolak'}
+              </span>
+            </div>
+            <p className="text-xs text-gray-500 font-medium mt-1">{st.deskripsi || 'Tidak ada deskripsi'}</p>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={() => bukaEdit(st)} className="p-2.5 bg-white text-amber-500 rounded-xl shadow-sm border border-amber-50 hover:bg-amber-50 transition-colors" title="Edit Status"><Edit3 size={14} /></button>
+            <button onClick={() => handleHapus(st.id_status)} className="p-2.5 bg-white text-red-500 rounded-xl shadow-sm border border-red-50 hover:bg-red-50 transition-colors" title="Hapus Status"><Trash2 size={14} /></button>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+const PanelPeriode = ({ dataPeriode, bukaEdit, setFormPeriode, setShowModalPeriode, handleHapus, handleSetAktif }) => (
+  <div className="bg-white p-8 md:p-10 rounded-[3rem] shadow-sm border border-gray-100 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-4xl mx-auto">
+    <div className="flex justify-between items-center mb-6">
+      <h4 className="font-black text-blue-900 uppercase italic flex items-center gap-3"><Calendar className="text-blue-600" /> Pengaturan Periode & Sinkronisasi</h4>
+      <button onClick={() => { setFormPeriode({ id_periode: '', nama_periode: '', tanggal_mulai: '', tanggal_selesai: '', is_aktif: 0 }); setShowModalPeriode(true); }} className="bg-blue-100 text-blue-700 px-4 py-2 rounded-xl font-black text-[10px] uppercase hover:bg-blue-600 hover:text-white transition-colors">
+        + Tambah
+      </button>
+    </div>
+    <div className="space-y-3">
+      {dataPeriode.map(pr => (
+        <div key={pr.id_periode} className={`flex flex-col md:flex-row justify-between items-start md:items-center p-5 rounded-3xl border ${pr.is_aktif == 1 ? 'bg-blue-50 border-blue-200 shadow-sm' : 'bg-gray-50 border-gray-100'} gap-4`}>
+          <div>
+            <div className="flex items-center gap-3">
+              <p className="font-black text-blue-900 text-sm uppercase">{pr.nama_periode}</p>
+              {pr.is_aktif == 1 && <span className="px-3 py-1 rounded-full text-[9px] font-black uppercase bg-blue-600 text-white shadow-sm">Periode Aktif Saat Ini</span>}
+            </div>
+            <p className="text-xs text-gray-500 font-bold uppercase mt-1 tracking-widest">{pr.tanggal_mulai} s/d {pr.tanggal_selesai}</p>
+          </div>
+          <div className="flex gap-2 items-center w-full md:w-auto">
+            {pr.is_aktif == 0 && (
+              <button onClick={() => handleSetAktif(pr.id_periode)} className="flex-1 md:flex-none px-4 py-2.5 bg-white text-emerald-600 font-black text-[10px] uppercase tracking-widest rounded-xl shadow-sm border border-emerald-100 hover:bg-emerald-50 transition-colors">Set Aktif</button>
+            )}
+            <button onClick={() => bukaEdit(pr)} className="p-2.5 bg-white text-amber-500 rounded-xl shadow-sm border border-amber-50 hover:bg-amber-50 transition-colors" title="Edit Periode"><Edit3 size={14} /></button>
+            <button onClick={() => handleHapus(pr.id_periode)} className="p-2.5 bg-white text-red-500 rounded-xl shadow-sm border border-red-50 hover:bg-red-50 transition-colors" title="Hapus Periode"><Trash2 size={14} /></button>
+          </div>
+        </div>
+      ))}
     </div>
   </div>
 );

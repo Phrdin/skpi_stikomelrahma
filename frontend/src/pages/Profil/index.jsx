@@ -28,7 +28,7 @@ const Profil = () => {
     foto_formal: '',
     gelar: '',
     tahun_lulus: '',
-    status_mahasiswa: 'Aktif'
+    status_mahasiswa_text: 'Aktif'
   });
 
   const [formData, setFormData] = useState({ ...profil });
@@ -235,7 +235,7 @@ useEffect(() => {
           <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
               <InfoRow ikon={<BookOpen size={18}/>} label="Program Studi" nilai={profil.program_studi} />
-              <InfoRow ikon={<Shield size={18}/>} label="Status Mahasiswa" nilai={profil.status_mahasiswa || 'Aktif'} />
+              <InfoRow ikon={<Shield size={18}/>} label="Status Mahasiswa" nilai={profil.status_mahasiswa_text || 'Aktif'} />
               <InfoRow ikon={<Shield size={18}/>} label="NIK" nilai={profil.nik || '-'} />
               <InfoRow ikon={<GraduationCap size={18}/>} label="Angkatan" nilai={profil.angkatan || '-'} />
               <InfoRow ikon={<BookOpen size={18}/>} label="Semester Aktif" nilai={`Semester ${profil.semester_aktif || 1}`} />

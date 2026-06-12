@@ -46,20 +46,27 @@ try {
         if ($db_semester > 0) {
             $smt_aktif = $db_semester;
         } else {
-            // Kalkulasi Semester Otomatis berdasarkan selisih bulan sejak September tahun angkatan
-            $tahunSekarang = (int)date('Y');
-            $bulanSekarang = (int)date('n');
-            
-            $selisihBulan = (($tahunSekarang - (int)$angkatan) * 12) + $bulanSekarang - 9;
-            
-            if ($selisihBulan < 0) {
-                $smt_aktif = 1;
+            // Hitung manual berdasarkan angkatan jika semester aktif kosong
+            $stmt_akt = $pdo->prepare("SELECT tahun FROM angkatan WHERE tahun = ? OR nama_angkatan = ? LIMIT 1");
+            $stmt_akt->execute([$mhs_data['angkatan'], $mhs_data['angkatan']]);
+            $thn_angkatan = (int)$stmt_akt->fetchColumn();
+
+            if ($thn_angkatan > 0) {
+                $bulan_sekarang = (int)date('n');
+                $tahun_sekarang = (int)date('Y');
+                $selisih_tahun = $tahun_sekarang - $thn_angkatan;
+                if ($bulan_sekarang >= 9) {
+                    $smt_aktif = ($selisih_tahun * 2) + 1;
+                } else if ($bulan_sekarang < 3) {
+                    $smt_aktif = (($selisih_tahun - 1) * 2) + 1;
+                } else {
+                    $smt_aktif = (($selisih_tahun - 1) * 2) + 2;
+                }
             } else {
-                $smt_aktif = floor($selisihBulan / 6) + 1;
+                $smt_aktif = 1;
             }
-            
             if ($smt_aktif < 1) $smt_aktif = 1;
-            if ($smt_aktif > 8) $smt_aktif = 8;
+            if ($smt_aktif > 8) $smt_aktif = 8; // Batas maksimal target SKPI biasanya semester 8
         }
 
         // 2. Ambil target poin untuk semester aktif

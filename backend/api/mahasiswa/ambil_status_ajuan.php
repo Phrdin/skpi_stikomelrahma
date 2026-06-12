@@ -51,6 +51,16 @@ if ($method === 'POST') {
             exit();
         }
 
+        // Cek izin akses dari master status mahasiswa
+        $stmtCekStatus = $pdo->prepare("SELECT s.izin_akses_skpi, s.nama_status FROM kegiatan_mahasiswa k JOIN mahasiswa m ON k.nomor_induk = m.nomor_induk JOIN master_status_mahasiswa s ON m.id_status = s.id_status WHERE k.id = ?");
+        $stmtCekStatus->execute([$id]);
+        $statusMhs = $stmtCekStatus->fetch(PDO::FETCH_ASSOC);
+
+        if (!$statusMhs || $statusMhs['izin_akses_skpi'] != 1) {
+            echo json_encode(["status" => "error", "pesan" => "Status Anda saat ini adalah " . ($statusMhs['nama_status'] ?? 'Tidak Dikenal') . ". Anda tidak dapat mengubah ajuan SKPI."]);
+            exit();
+        }
+
         // Ambil Data Master Baru
         $stmtMaster = $pdo->prepare("SELECT nama_kegiatan, bobot FROM master_kategori_skpi WHERE id_master_kategori = ?");
         $stmtMaster->execute([$id_master]);

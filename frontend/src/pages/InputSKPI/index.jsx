@@ -166,6 +166,20 @@ const InputSKPI = () => {
     }
   };
 
+  if (pengguna && pengguna.izin_akses_skpi == 0) {
+    return (
+      <div className="animate-in fade-in duration-500 pb-20">
+        <div className="bg-red-50 p-6 rounded-2xl border border-red-200 flex flex-col items-center justify-center text-center mt-10">
+          <AlertTriangle size={64} className="text-red-500 mb-4" />
+          <h2 className="text-2xl font-bold text-red-700 mb-2">Akses Ditolak</h2>
+          <p className="text-red-600 max-w-md">
+            Status Anda saat ini adalah <strong>{pengguna.nama_status || 'Tidak Dikenal'}</strong>. Anda tidak diizinkan untuk menambah ajuan SKPI.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <form onSubmit={handleSimpan} className="animate-in fade-in duration-500 pb-20">
       {/* Header EDOM Style */}

@@ -18,8 +18,10 @@ if ($method === 'GET') {
 
     $nim = $_GET['nim'] ?? '';
     try {
-        $sql = "SELECT p.nama_lengkap, m.* FROM pengguna p 
+        $sql = "SELECT p.nama_lengkap, m.*, s.nama_status as status_mahasiswa_text 
+                FROM pengguna p 
                 LEFT JOIN mahasiswa m ON p.nomor_induk = m.nomor_induk 
+                LEFT JOIN master_status_mahasiswa s ON m.id_status = s.id_status
                 WHERE p.nomor_induk = ?";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$nim]);
@@ -51,7 +53,7 @@ if ($method === 'POST') {
                 $sql = "UPDATE mahasiswa SET no_hp=?, email=?, alamat=? WHERE nomor_induk=?";
                 $pdo->prepare($sql)->execute([$hp, $email, $alamat, $nim]);
             } else {
-                $sql = "INSERT INTO mahasiswa (nomor_induk, no_hp, email, alamat, status_mahasiswa) VALUES (?, ?, ?, ?, 'Aktif')";
+                $sql = "INSERT INTO mahasiswa (nomor_induk, no_hp, email, alamat, id_status) VALUES (?, ?, ?, ?, 1)";
                 $pdo->prepare($sql)->execute([$nim, $hp, $email, $alamat]);
             }
             $pdo->commit();

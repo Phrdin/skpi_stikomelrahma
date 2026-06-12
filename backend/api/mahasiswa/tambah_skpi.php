@@ -11,6 +11,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $waktu_pelaksanaan = isset($_POST['waktu_pelaksanaan']) ? $_POST['waktu_pelaksanaan'] : null;
 
         try {
+            // CEK STATUS MAHASISWA DAN IZIN AKSES
+            $stmtCek = $pdo->prepare("SELECT s.izin_akses_skpi, s.nama_status FROM mahasiswa m JOIN master_status_mahasiswa s ON m.id_status = s.id_status WHERE m.nomor_induk = ?");
+            $stmtCek->execute([$nim]);
+            $statusMhs = $stmtCek->fetch();
+
+            if (!$statusMhs || $statusMhs['izin_akses_skpi'] != 1) {
+                echo json_encode(["status" => "error", "pesan" => "Status Anda saat ini adalah " . ($statusMhs['nama_status'] ?? 'Tidak Dikenal') . ". Anda tidak dapat mengunggah ajuan SKPI."]);
+                exit();
+            }
+
             // AMBIL DATA DARI MASTER (Agar Poin & Judul Aman / Tidak Bisa Dimanipulasi Mahasiswa)
             $stmtMaster = $pdo->prepare("SELECT nama_kegiatan, bobot FROM master_kategori_skpi WHERE id_master_kategori = ?");
             $stmtMaster->execute([$id_master]);

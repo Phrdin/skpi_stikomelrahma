@@ -16,7 +16,14 @@ function login($pdo) {
 
     try {
         // Cari user di database berdasarkan NIM (tanpa password dulu)
-        $stmt = $pdo->prepare("SELECT id, nomor_induk, nama_lengkap, peran, wajib_ganti_sandi, kata_sandi as hash_sandi FROM pengguna WHERE nomor_induk = ? AND status_aktif = 1");
+        // Kita juga perlu nge-join mahasiswa dan master_status_mahasiswa jika peran=mahasiswa untuk ambil izin_akses_skpi
+        $sql = "SELECT p.id, p.nomor_induk, p.nama_lengkap, p.peran, p.wajib_ganti_sandi, p.kata_sandi as hash_sandi, 
+                       m.id_status, s.nama_status, s.izin_akses_skpi
+                FROM pengguna p 
+                LEFT JOIN mahasiswa m ON p.nomor_induk = m.nomor_induk 
+                LEFT JOIN master_status_mahasiswa s ON m.id_status = s.id_status
+                WHERE p.nomor_induk = ? AND p.status_aktif = 1";
+        $stmt = $pdo->prepare($sql);
         $stmt->execute([$nomor_induk]);
         $user = $stmt->fetch();
 
@@ -39,6 +46,9 @@ function login($pdo) {
 
             // Hapus password dari response agar aman
             unset($user['hash_sandi']);
+
+            // Jalankan sinkronisasi periode otomatis di background
+            require_once __DIR__ . '/../api/admin/sinkron_periode_otomatis.php';
 
             // Jika berhasil login
             http_response_code(200);

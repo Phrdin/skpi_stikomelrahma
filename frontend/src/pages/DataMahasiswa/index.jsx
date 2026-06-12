@@ -7,6 +7,7 @@ import { Pencil, Trash2, Eye, EyeOff, Download, Upload, Plus, Search, Filter, Pr
 const DataMahasiswa = () => {
   const [daftar, setDaftar] = useState([]);
   const [opsiAngkatan, setOpsiAngkatan] = useState([]);
+  const [opsiStatus, setOpsiStatus] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
@@ -23,7 +24,7 @@ const DataMahasiswa = () => {
     nomor_induk: '', nama_lengkap: '', id_angkatan: '', kata_sandi: '', 
     program_studi: '', tempat_lahir: '', tanggal_lahir: '', jenis_kelamin: '', 
     no_hp: '', email: '', alamat: '', nik: '', agama: '', semester_aktif: '', 
-    gelar: '', tahun_lulus: '', status_mahasiswa: 'Aktif',
+    semester_berjalan: '', gelar: '', tahun_lulus: '', id_status: 1,
     is_edit: false 
   });
 
@@ -38,6 +39,10 @@ const DataMahasiswa = () => {
       const resA = await fetch('https://skpi-stikomelrahma.my.id/backend/api/umum/ambil_opsi.php?aksi=opsi_filter');
       const hasilA = await resA.json();
       if (hasilA.status === 'sukses') setOpsiAngkatan(hasilA.angkatan);
+      
+      const resS = await fetch('https://skpi-stikomelrahma.my.id/backend/api/admin/kelola_status.php?aksi=ambil');
+      const hasilS = await resS.json();
+      if (hasilS.status === 'sukses') setOpsiStatus(hasilS.data);
     } catch (err) { console.error("Gagal ambil data"); }
     finally { setLoading(false); }
   };
@@ -59,9 +64,10 @@ const DataMahasiswa = () => {
       Email: m.email || '-',
       Alamat: m.alamat || '-',
       Semester_Aktif: m.semester_aktif || '-',
+      Semester_Berjalan: m.semester_berjalan || '-',
       Tahun_Lulus: m.tahun_lulus || '-',
       Gelar: m.gelar || '-',
-      Status_Mahasiswa: m.status_mahasiswa || 'Aktif',
+      Status_Mahasiswa: m.status_mahasiswa_text || 'Aktif',
       Total_Poin: m.total_poin || 0
     }));
     const worksheet = XLSX.utils.json_to_sheet(dataExport);
@@ -153,7 +159,7 @@ const DataMahasiswa = () => {
                   nomor_induk:'', nama_lengkap:'', id_angkatan:'', kata_sandi:'', 
                   program_studi: '', tempat_lahir: '', tanggal_lahir: '', jenis_kelamin: '', 
                   no_hp: '', email: '', alamat: '', nik: '', agama: '', semester_aktif: '', 
-                  gelar: '', tahun_lulus: '', 
+                  semester_berjalan: '', gelar: '', tahun_lulus: '', id_status: 1,
                   is_edit: false 
                 }); 
                 setShowModal(true); 
@@ -380,11 +386,8 @@ const DataMahasiswa = () => {
                     </div>
                     <div>
                       <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-2">Status Mahasiswa</label>
-                      <select className="w-full p-4 bg-gray-50 rounded-2xl font-bold outline-none border-2 border-transparent focus:border-blue-600 cursor-pointer text-sm" value={form.status_mahasiswa || 'Aktif'} onChange={e => setForm({...form, status_mahasiswa: e.target.value})}>
-                          <option value="Aktif">Aktif</option>
-                          <option value="Cuti">Cuti</option>
-                          <option value="Lulus">Lulus</option>
-                          <option value="Putus Studi">Putus Studi</option>
+                      <select className="w-full p-4 bg-gray-50 rounded-2xl font-bold outline-none border-2 border-transparent focus:border-blue-600 cursor-pointer text-sm" value={form.id_status || 1} onChange={e => setForm({...form, id_status: e.target.value})}>
+                          {opsiStatus.map(s => <option key={s.id_status} value={s.id_status}>{s.nama_status}</option>)}
                       </select>
                     </div>
                   </div>
@@ -395,14 +398,20 @@ const DataMahasiswa = () => {
                       <input type="number" placeholder="Cth: 1, 2, 3" className="w-full p-4 bg-gray-50 rounded-2xl font-bold outline-none border-2 border-transparent focus:border-blue-600 text-sm" value={form.semester_aktif || ''} onChange={e => setForm({...form, semester_aktif: e.target.value})} />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-2">Tahun Lulus</label>
-                      <input type="text" placeholder="Cth: 2028" className="w-full p-4 bg-gray-50 rounded-2xl font-bold outline-none border-2 border-transparent focus:border-blue-600 text-sm" value={form.tahun_lulus || ''} onChange={e => setForm({...form, tahun_lulus: e.target.value})} />
+                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-2">Semester Berjalan</label>
+                      <input type="number" placeholder="Cth: 1, 2, 3" className="w-full p-4 bg-gray-50 rounded-2xl font-bold outline-none border-2 border-transparent focus:border-blue-600 text-sm" value={form.semester_berjalan || ''} onChange={e => setForm({...form, semester_berjalan: e.target.value})} />
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-2">Gelar Kelulusan</label>
-                    <input type="text" placeholder="Contoh: S.Kom" className="w-full p-4 bg-gray-50 rounded-2xl font-bold outline-none border-2 border-transparent focus:border-blue-600 text-sm" value={form.gelar || ''} onChange={e => setForm({...form, gelar: e.target.value})} />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-2">Tahun Lulus</label>
+                      <input type="text" placeholder="Cth: 2028" className="w-full p-4 bg-gray-50 rounded-2xl font-bold outline-none border-2 border-transparent focus:border-blue-600 text-sm" value={form.tahun_lulus || ''} onChange={e => setForm({...form, tahun_lulus: e.target.value})} />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-2">Gelar Kelulusan</label>
+                      <input type="text" placeholder="Contoh: S.Kom" className="w-full p-4 bg-gray-50 rounded-2xl font-bold outline-none border-2 border-transparent focus:border-blue-600 text-sm" value={form.gelar || ''} onChange={e => setForm({...form, gelar: e.target.value})} />
+                    </div>
                   </div>
                 </div>
 
@@ -502,7 +511,7 @@ const DataMahasiswa = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
                         <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Status Mahasiswa</label>
-                        <div className={`font-black text-sm uppercase ${dataLihat.status_mahasiswa === 'Aktif' ? 'text-green-500' : 'text-amber-500'}`}>{dataLihat.status_mahasiswa || 'Aktif'}</div>
+                        <div className={`font-black text-sm uppercase ${dataLihat.status_mahasiswa_text === 'Aktif' ? 'text-green-500' : 'text-amber-500'}`}>{dataLihat.status_mahasiswa_text || 'Aktif'}</div>
                     </div>
                     <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
                         <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Angkatan</label>
@@ -516,8 +525,8 @@ const DataMahasiswa = () => {
                         <div className="font-bold text-gray-700 text-sm uppercase">{dataLihat.program_studi || '-'}</div>
                     </div>
                     <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Semester Aktif</label>
-                        <div className="font-bold text-gray-700 text-sm uppercase">{dataLihat.semester_aktif || '-'}</div>
+                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Sem Aktif / Berjalan</label>
+                        <div className="font-bold text-gray-700 text-sm uppercase">{dataLihat.semester_aktif || '-'} / {dataLihat.semester_berjalan || '-'}</div>
                     </div>
                   </div>
 
