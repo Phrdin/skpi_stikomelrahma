@@ -4,8 +4,9 @@ header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header("Content-Type: application/json");
 
+require '../../konfigurasi/cors.php';
 require '../../konfigurasi/database.php';
-require '../umum/otentikasi.php';
+require '../../keamanan/CekToken.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
