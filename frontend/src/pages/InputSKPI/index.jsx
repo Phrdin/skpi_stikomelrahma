@@ -31,6 +31,9 @@ const InputSKPI = () => {
   const [fileSertifikat, setFileSertifikat] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
 
+  const [panduanFile, setPanduanFile] = useState(null);
+  const [showPanduan, setShowPanduan] = useState(false);
+
   // 1. Ambil Data Master dari Database
   useEffect(() => {
     const fetchMaster = async () => {
@@ -46,7 +49,19 @@ const InputSKPI = () => {
         console.error("Gagal mengambil master kategori");
       }
     };
+    
+    const fetchPanduan = async () => {
+      try {
+        const res = await fetch('https://skpi-stikomelrahma.my.id/backend/api/admin/pengaturan.php?aksi=ambil');
+        const hasil = await res.json();
+        if (hasil.status === 'sukses' && hasil.data.skpi_panduan_file) {
+          setPanduanFile(hasil.data.skpi_panduan_file);
+        }
+      } catch (err) {}
+    };
+
     fetchMaster();
+    fetchPanduan();
   }, []);
 
   // 2. Logika Dropdown Bertingkat (Dependent Dropdown)
@@ -192,6 +207,16 @@ const InputSKPI = () => {
             Tambah Ajuan Sertifikat & Kegiatan
           </p>
         </div>
+        
+        {panduanFile && (
+          <button 
+            type="button" 
+            onClick={() => setShowPanduan(true)} 
+            className="flex items-center gap-2 bg-emerald-50 text-emerald-600 px-4 py-2 rounded-xl font-bold text-xs uppercase hover:bg-emerald-100 transition-colors border border-emerald-100 shadow-sm"
+          >
+            <FileText size={16} /> Lihat Panduan Bobot SKPI
+          </button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
@@ -314,6 +339,28 @@ const InputSKPI = () => {
           </button>
         </div>
       </div>
+      {/* MODAL PANDUAN */}
+      {showPanduan && panduanFile && (
+        <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center z-[200] p-4 animate-in fade-in">
+          <div className="bg-white w-full max-w-4xl h-[90vh] flex flex-col rounded-2xl shadow-xl overflow-hidden animate-in zoom-in duration-300">
+            <div className="p-6 bg-emerald-50 border-b border-emerald-100 flex justify-between items-center">
+              <div className="flex items-center gap-3 text-emerald-800">
+                <FileText size={20} />
+                <h3 className="text-lg font-black uppercase italic">Panduan Bobot Poin SKPI</h3>
+              </div>
+              <button onClick={() => setShowPanduan(false)} className="p-2 text-gray-400 hover:bg-white rounded-xl transition-colors hover:text-red-500"><X size={20}/></button>
+            </div>
+            <div className="flex-1 bg-gray-50 p-4 overflow-hidden relative">
+              <iframe 
+                src={`https://skpi-stikomelrahma.my.id/backend/unggahan/panduan_skpi/${panduanFile}`} 
+                className="w-full h-full rounded-xl border border-gray-200 bg-white"
+                title="Panduan SKPI"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
     </form>
   );
 };

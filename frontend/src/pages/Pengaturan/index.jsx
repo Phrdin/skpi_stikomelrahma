@@ -50,7 +50,8 @@ const Pengaturan = () => {
     skpi_pos_lulus: '',
     skpi_pos_foto: '',
     skpi_pos_tabel: '',
-    skpi_pos_ttd: ''
+    skpi_pos_ttd: '',
+    skpi_panduan_file: ''
   });
   const [loadingSKPI, setLoadingSKPI] = useState(false);
 
@@ -114,7 +115,8 @@ const Pengaturan = () => {
           skpi_pos_lulus: hasil.data.skpi_pos_lulus || '',
           skpi_pos_foto: hasil.data.skpi_pos_foto || '',
           skpi_pos_tabel: hasil.data.skpi_pos_tabel || '',
-          skpi_pos_ttd: hasil.data.skpi_pos_ttd || ''
+          skpi_pos_ttd: hasil.data.skpi_pos_ttd || '',
+          skpi_panduan_file: hasil.data.skpi_panduan_file || ''
         });
       }
     } catch (err) { console.error("Gagal ambil pengaturan SKPI"); }
@@ -199,6 +201,26 @@ const Pengaturan = () => {
     finally { setLoadingSKPI(false); }
   };
 
+  const handleUploadPanduan = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.type !== 'application/pdf') return Swal.fire('Format Salah', 'Gunakan file PDF', 'error');
+    const formData = new FormData();
+    formData.append('file_panduan', file);
+    setLoadingSKPI(true);
+    try {
+      const res = await fetch('https://skpi-stikomelrahma.my.id/backend/api/admin/upload_panduan.php', { method: 'POST', body: formData });
+      const hasil = await res.json();
+      if (hasil.status === 'sukses') {
+        setSkpiSettings(prev => ({ ...prev, skpi_panduan_file: hasil.file }));
+        Swal.fire('Berhasil!', 'Panduan SKPI diperbarui.', 'success');
+      } else {
+        Swal.fire('Gagal', hasil.pesan, 'error');
+      }
+    } catch (err) { console.error(err); }
+    finally { setLoadingSKPI(false); }
+  };
+
   useEffect(() => { ambilAngkatan(); ambilSemester(); ambilPengaturanSKPI(); ambilStatus(); ambilPeriode(); ambilProdi(); }, []);
 
   return (
@@ -251,6 +273,7 @@ const Pengaturan = () => {
             onSave={simpanPengaturanSKPI}
             onUpload={handleUploadTTD}
             onUploadTemplate={handleUploadTemplate}
+            onUploadPanduan={handleUploadPanduan}
             loading={loadingSKPI}
           />
         )}
@@ -895,7 +918,7 @@ const VisualEditor = ({ settings, setSettings, onSave, loading }) => {
   );
 };
 
-const PanelSKPI = ({ settings, setSettings, onSave, onUpload, onUploadTemplate, loading }) => (
+const PanelSKPI = ({ settings, setSettings, onSave, onUpload, onUploadTemplate, onUploadPanduan, loading }) => (
   <>
     <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 animate-in slide-in-from-bottom-5 duration-500">
       <div className="space-y-8">
@@ -951,6 +974,29 @@ const PanelSKPI = ({ settings, setSettings, onSave, onUpload, onUploadTemplate, 
             {loading ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
             Simpan Format Nomor
           </button>
+        </div>
+
+        {/* PANDUAN SKPI */}
+        <div className="bg-white p-8 md:p-10 rounded-[3rem] shadow-sm border border-gray-100 text-center">
+          <h4 className="font-black text-blue-900 uppercase italic mb-8 flex justify-center items-center gap-3"><FileText className="text-emerald-500" /> Panduan Bobot SKPI (PDF)</h4>
+          <div className="relative group bg-gray-50 p-8 rounded-[2rem] border-2 border-dashed border-gray-200">
+            {settings.skpi_panduan_file ? (
+              <div className="flex flex-col items-center gap-3">
+                <FileText size={40} className="text-emerald-500" />
+                <p className="text-xs font-bold text-gray-600">{settings.skpi_panduan_file}</p>
+                <div className="flex gap-2">
+                  <a href={`https://skpi-stikomelrahma.my.id/backend/unggahan/panduan_skpi/${settings.skpi_panduan_file}`} target="_blank" rel="noreferrer" className="bg-blue-100 text-blue-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase z-50 relative">Buka Preview</a>
+                  <button className="bg-emerald-100 text-emerald-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase relative pointer-events-none">Ganti PDF</button>
+                </div>
+              </div>
+            ) : (
+              <div className="py-10 text-gray-300 font-black uppercase text-[10px]">Upload Panduan PDF</div>
+            )}
+            <input type="file" accept="application/pdf" className="absolute inset-0 opacity-0 cursor-pointer z-[40]" onChange={onUploadPanduan} />
+          </div>
+          <p className="text-[10px] font-bold text-gray-400 mt-4 leading-relaxed">
+            * Panduan ini akan muncul di halaman Mahasiswa pada saat melakukan Input SKPI. Jika ada revisi pedoman terbaru, cukup upload file PDF yang baru untuk menggantikannya.
+          </p>
         </div>
       </div>
     </div>
