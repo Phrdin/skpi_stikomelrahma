@@ -3,8 +3,6 @@
 require '../../konfigurasi/database.php';
 
 try {
-    $pdo->beginTransaction();
-
     // 1. Buat master_prodi jika belum ada
     $pdo->exec("CREATE TABLE IF NOT EXISTS master_prodi (
         id_prodi INT AUTO_INCREMENT PRIMARY KEY,
@@ -53,13 +51,7 @@ try {
         $pdo->exec("ALTER TABLE mahasiswa ADD COLUMN id_status INT DEFAULT 1");
     }
     
-    // Pastikan tipe data kolom relasi cocok sebelum di-FK (Angkatan.id adalah INT(11) atau sejenisnya)
-    // Di mysql, Foreign Key wajib memiliki tipe data yang persis sama.
-    // Misalnya id_angkatan di mahasiswa harus INT(11) jika id di angkatan INT(11)
-    
-    $pdo->commit();
-
-    // 3. Tambahkan RELASI FOREIGN KEY (Harus di luar transaksi utama di beberapa versi MariaDB/MySQL jika tabel sedang di-lock)
+    // 3. Tambahkan RELASI FOREIGN KEY
     $relasi_berhasil = 0;
     
     // Fungsi bantuan untuk cek FK
@@ -68,6 +60,10 @@ try {
         $stmt->execute([$table, $fk_name]);
         return $stmt->rowCount() > 0;
     }
+
+    // Cek kemungkinan ada record mahasiswa dengan id_angkatan yang tidak ada di tabel angkatan (data orphan), 
+    // jika ada update ke null agar FK bisa terbuat (tergantung apakah id_angkatan boleh null).
+    $pdo->exec("UPDATE mahasiswa m LEFT JOIN angkatan a ON m.id_angkatan = a.id SET m.id_angkatan = NULL WHERE a.id IS NULL");
 
     // FK Mahasiswa -> Angkatan
     if (!checkFKExists($pdo, 'mahasiswa', 'fk_mahasiswa_angkatan')) {
@@ -93,9 +89,6 @@ try {
     echo "- $relasi_berhasil Relasi Antar Tabel (Foreign Key) baru berhasil disambungkan.";
 
 } catch (Exception $e) {
-    if ($pdo->inTransaction()) {
-        $pdo->rollBack();
-    }
     echo "Gagal memperbaiki database: " . $e->getMessage();
 }
 ?>
