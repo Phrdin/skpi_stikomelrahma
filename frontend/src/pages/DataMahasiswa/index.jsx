@@ -7,6 +7,7 @@ import { Pencil, Trash2, Eye, EyeOff, Download, Upload, Plus, Search, Filter, Pr
 const DataMahasiswa = () => {
   const [daftar, setDaftar] = useState([]);
   const [opsiAngkatan, setOpsiAngkatan] = useState([]);
+  const [opsiProdi, setOpsiProdi] = useState([]);
   const [opsiStatus, setOpsiStatus] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -22,11 +23,23 @@ const DataMahasiswa = () => {
   const [showPasswordDetail, setShowPasswordDetail] = useState(false);
   const [form, setForm] = useState({ 
     nomor_induk: '', nama_lengkap: '', id_angkatan: '', kata_sandi: '', 
-    program_studi: '', tempat_lahir: '', tanggal_lahir: '', jenis_kelamin: '', 
+    id_prodi: '', tempat_lahir: '', tanggal_lahir: '', jenis_kelamin: '', 
     no_hp: '', email: '', alamat: '', nik: '', agama: '', semester_aktif: '', 
     semester_berjalan: '', gelar: '', tahun_lulus: '', id_status: 1,
     is_edit: false 
   });
+
+  const autoCalcProdi = (newForm, pProdiList, pAngkatanList) => {
+    if (newForm.id_prodi && newForm.id_angkatan && pProdiList.length > 0 && pAngkatanList.length > 0) {
+       const selectedProdi = pProdiList.find(p => p.id_prodi == newForm.id_prodi);
+       const selectedAngkatan = pAngkatanList.find(a => a.id == newForm.id_angkatan);
+       if (selectedProdi && selectedAngkatan) {
+          newForm.gelar = selectedProdi.gelar_lulusan;
+          newForm.tahun_lulus = parseInt(selectedAngkatan.tahun) + parseInt(selectedProdi.masa_studi_tahun);
+       }
+    }
+    return newForm;
+  };
 
   const ambilData = async () => {
     setLoading(true);
@@ -38,7 +51,10 @@ const DataMahasiswa = () => {
       
       const resA = await fetch('https://skpi-stikomelrahma.my.id/backend/api/umum/ambil_opsi.php?aksi=opsi_filter');
       const hasilA = await resA.json();
-      if (hasilA.status === 'sukses') setOpsiAngkatan(hasilA.angkatan);
+      if (hasilA.status === 'sukses') {
+        setOpsiAngkatan(hasilA.angkatan);
+        setOpsiProdi(hasilA.prodi || []);
+      }
       
       const resS = await fetch('https://skpi-stikomelrahma.my.id/backend/api/admin/kelola_status.php?aksi=ambil');
       const hasilS = await resS.json();
@@ -157,7 +173,7 @@ const DataMahasiswa = () => {
             <button onClick={() => { 
                 setForm({ 
                   nomor_induk:'', nama_lengkap:'', id_angkatan:'', kata_sandi:'', 
-                  program_studi: '', tempat_lahir: '', tanggal_lahir: '', jenis_kelamin: '', 
+                  id_prodi: '', tempat_lahir: '', tanggal_lahir: '', jenis_kelamin: '', 
                   no_hp: '', email: '', alamat: '', nik: '', agama: '', semester_aktif: '', 
                   semester_berjalan: '', gelar: '', tahun_lulus: '', id_status: 1,
                   is_edit: false 
@@ -363,7 +379,10 @@ const DataMahasiswa = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-2">Angkatan *</label>
-                      <select className="w-full p-4 bg-gray-50 rounded-2xl font-bold outline-none border-2 border-transparent focus:border-blue-600 cursor-pointer text-sm" value={form.id_angkatan} onChange={e => setForm({...form, id_angkatan: e.target.value})} required>
+                      <select className="w-full p-4 bg-gray-50 rounded-2xl font-bold outline-none border-2 border-transparent focus:border-blue-600 cursor-pointer text-sm" value={form.id_angkatan} onChange={e => {
+                          const newForm = { ...form, id_angkatan: e.target.value };
+                          setForm(autoCalcProdi(newForm, opsiProdi, opsiAngkatan));
+                      }} required>
                           <option value="">Pilih Angkatan</option>
                           {opsiAngkatan.map(a => <option key={a.id} value={a.id}>{a.nama_angkatan}</option>)}
                       </select>
@@ -377,11 +396,12 @@ const DataMahasiswa = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-2">Program Studi</label>
-                      <select className="w-full p-4 bg-gray-50 rounded-2xl font-bold outline-none border-2 border-transparent focus:border-blue-600 cursor-pointer text-sm" value={form.program_studi || ''} onChange={e => setForm({...form, program_studi: e.target.value})}>
+                      <select className="w-full p-4 bg-gray-50 rounded-2xl font-bold outline-none border-2 border-transparent focus:border-blue-600 cursor-pointer text-sm" value={form.id_prodi || ''} onChange={e => {
+                          const newForm = { ...form, id_prodi: e.target.value };
+                          setForm(autoCalcProdi(newForm, opsiProdi, opsiAngkatan));
+                      }}>
                           <option value="">-- Pilih Program Studi --</option>
-                          <option value="Informatika">Informatika</option>
-                          <option value="Teknik Informatika">Teknik Informatika</option>
-                          <option value="Sistem Informasi">Sistem Informasi</option>
+                          {opsiProdi.map(p => <option key={p.id_prodi} value={p.id_prodi}>{p.nama_prodi} ({p.jenjang})</option>)}
                       </select>
                     </div>
                     <div>
@@ -406,11 +426,11 @@ const DataMahasiswa = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-2">Tahun Lulus</label>
-                      <input type="text" placeholder="Cth: 2028" className="w-full p-4 bg-gray-50 rounded-2xl font-bold outline-none border-2 border-transparent focus:border-blue-600 text-sm" value={form.tahun_lulus || ''} onChange={e => setForm({...form, tahun_lulus: e.target.value})} />
+                      <input type="text" placeholder="Otomatis" className="w-full p-4 bg-gray-100 text-gray-500 rounded-2xl font-bold outline-none border-2 border-transparent text-sm cursor-not-allowed" value={form.tahun_lulus || ''} disabled readOnly />
                     </div>
                     <div>
                       <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-2">Gelar Kelulusan</label>
-                      <input type="text" placeholder="Contoh: S.Kom" className="w-full p-4 bg-gray-50 rounded-2xl font-bold outline-none border-2 border-transparent focus:border-blue-600 text-sm" value={form.gelar || ''} onChange={e => setForm({...form, gelar: e.target.value})} />
+                      <input type="text" placeholder="Otomatis" className="w-full p-4 bg-gray-100 text-gray-500 rounded-2xl font-bold outline-none border-2 border-transparent text-sm cursor-not-allowed" value={form.gelar || ''} disabled readOnly />
                     </div>
                   </div>
                 </div>

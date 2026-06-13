@@ -22,6 +22,11 @@ const Pengaturan = () => {
   const [showModalPeriode, setShowModalPeriode] = useState(false);
   const [formPeriode, setFormPeriode] = useState({ id_periode: '', nama_periode: '', tanggal_mulai: '', tanggal_selesai: '', is_aktif: 0 });
 
+  // --- STATE PROGRAM STUDI ---
+  const [dataProdi, setDataProdi] = useState([]);
+  const [showModalProdi, setShowModalProdi] = useState(false);
+  const [formProdi, setFormProdi] = useState({ id_prodi: '', nama_prodi: '', jenjang: 'S1', gelar_lulusan: '', masa_studi_tahun: 4 });
+
   // --- STATE AKADEMIK & ANGKATAN ---
   const [dataPoin, setDataPoin] = useState([]);
   const [daftarAngkatan, setDaftarAngkatan] = useState([]);
@@ -79,6 +84,14 @@ const Pengaturan = () => {
       const hasil = await res.json();
       if (hasil.status === 'sukses') setDataPeriode(hasil.data);
     } catch (err) { console.error("Gagal ambil data periode"); }
+  };
+
+  const ambilProdi = async () => {
+    try {
+      const res = await fetch('https://skpi-stikomelrahma.my.id/backend/api/admin/kelola_prodi.php?aksi=ambil');
+      const hasil = await res.json();
+      if (hasil.status === 'sukses') setDataProdi(hasil.data);
+    } catch (err) { console.error("Gagal ambil data prodi"); }
   };
 
   const ambilPengaturanSKPI = async () => {
@@ -186,7 +199,7 @@ const Pengaturan = () => {
     finally { setLoadingSKPI(false); }
   };
 
-  useEffect(() => { ambilAngkatan(); ambilSemester(); ambilPengaturanSKPI(); ambilStatus(); ambilPeriode(); }, []);
+  useEffect(() => { ambilAngkatan(); ambilSemester(); ambilPengaturanSKPI(); ambilStatus(); ambilPeriode(); ambilProdi(); }, []);
 
   return (
     <div className="animate-in fade-in duration-500 pb-20">
@@ -199,6 +212,7 @@ const Pengaturan = () => {
 
       <div className="flex bg-white p-2 rounded-[2rem] shadow-sm border mb-10 overflow-x-auto no-scrollbar gap-2">
         <TabButton aktif={tabAktif === 'akademik'} onClick={() => setTabAktif('akademik')} ikon={<GraduationCap size={18} />} label="Akademik & Angkatan" />
+        <TabButton aktif={tabAktif === 'prodi'} onClick={() => setTabAktif('prodi')} ikon={<AlignLeft size={18} />} label="Program Studi" />
         <TabButton aktif={tabAktif === 'status'} onClick={() => setTabAktif('status')} ikon={<Users size={18} />} label="Status Mahasiswa" />
         <TabButton aktif={tabAktif === 'periode'} onClick={() => setTabAktif('periode')} ikon={<Calendar size={18} />} label="Periode Sinkronisasi" />
         <TabButton aktif={tabAktif === 'skpi'} onClick={() => setTabAktif('skpi')} ikon={<FileText size={18} />} label="SKPI Resmi" />
@@ -248,9 +262,27 @@ const Pengaturan = () => {
             setShowModalStatus={setShowModalStatus}
             handleHapus={async (id) => {
               const konfirmasi = await Swal.fire({ title: 'Hapus Status?', text: "Data akan dihapus!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#9ca3af', confirmButtonText: 'Ya, Hapus!' });
-              if (!konfirmasi.isConfirmed) return;
-              const res = await fetch(`https://skpi-stikomelrahma.my.id/backend/api/admin/kelola_status.php?aksi=hapus`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id_status: id }) });
-              if ((await res.json()).status === 'sukses') { Swal.fire('Dihapus!', '', 'success'); ambilStatus(); }
+              if (konfirmasi.isConfirmed) {
+                const res = await fetch(`https://skpi-stikomelrahma.my.id/backend/api/admin/kelola_status.php?aksi=hapus`, { method: 'POST', body: JSON.stringify({ id_status: id }) });
+                if ((await res.json()).status === 'sukses') { Swal.fire('Terhapus!', '', 'success'); ambilStatus(); } else Swal.fire('Gagal', 'Masih ada mahasiswa menggunakan status ini', 'error');
+              }
+            }}
+          />
+        )}
+        {tabAktif === 'prodi' && (
+          <PanelProdi 
+            dataProdi={dataProdi} 
+            bukaEdit={(data) => { setFormProdi(data); setShowModalProdi(true); }}
+            setFormProdi={setFormProdi}
+            setShowModalProdi={setShowModalProdi}
+            handleHapus={async (id) => {
+              const konfirmasi = await Swal.fire({ title: 'Hapus Prodi?', text: "Data akan dihapus!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#9ca3af', confirmButtonText: 'Ya, Hapus!' });
+              if (konfirmasi.isConfirmed) {
+                const res = await fetch(`https://skpi-stikomelrahma.my.id/backend/api/admin/kelola_prodi.php?aksi=hapus`, { method: 'POST', body: JSON.stringify({ id_prodi: id }) });
+                const result = await res.json();
+                if (result.status === 'sukses') { Swal.fire('Terhapus!', '', 'success'); ambilProdi(); } 
+                else Swal.fire('Gagal', result.pesan, 'error');
+              }
             }}
           />
         )}
@@ -295,6 +327,39 @@ const Pengaturan = () => {
                     body: JSON.stringify(dataEdit)
                   });
                   if ((await res.json()).status === 'sukses') { setShowEditModal(false); ambilAngkatan(); Swal.fire(dataEdit.id ? 'Diperbarui!' : 'Ditambahkan!', '', 'success'); }
+                }} className="w-2/3 bg-blue-600 text-white py-5 rounded-3xl font-black uppercase">Simpan</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL PRODI */}
+      {showModalProdi && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in">
+          <div className="bg-white p-8 rounded-[3rem] w-full max-w-md shadow-2xl scale-in-center">
+            <h3 className="font-black text-blue-900 text-xl uppercase mb-6">{formProdi.id_prodi ? 'Edit Prodi' : 'Tambah Prodi'}</h3>
+            <div className="space-y-4">
+              <InputGroup label="Nama Program Studi" value={formProdi.nama_prodi} onChange={e => setFormProdi({ ...formProdi, nama_prodi: e.target.value })} />
+              <div className="text-left space-y-2">
+                <label className="text-[9px] font-black text-gray-400 uppercase ml-2 tracking-widest">Jenjang Pendidikan</label>
+                <select className="w-full p-4 bg-gray-50 rounded-2xl font-bold text-xs outline-none focus:ring-2 focus:ring-blue-600 shadow-inner" value={formProdi.jenjang} onChange={e => setFormProdi({...formProdi, jenjang: e.target.value})}>
+                  <option value="S1">S1 (Strata 1)</option>
+                  <option value="D3">D3 (Diploma 3)</option>
+                </select>
+              </div>
+              <InputGroup label="Gelar Lulusan (Contoh: S.Kom)" value={formProdi.gelar_lulusan} onChange={e => setFormProdi({ ...formProdi, gelar_lulusan: e.target.value })} />
+              <InputGroup type="number" label="Masa Studi Normal (Dalam Tahun)" value={formProdi.masa_studi_tahun} onChange={e => setFormProdi({ ...formProdi, masa_studi_tahun: e.target.value })} />
+              
+              <div className="flex gap-3 pt-4">
+                <button onClick={() => setShowModalProdi(false)} className="w-1/3 bg-gray-100 text-gray-600 py-5 rounded-3xl font-black uppercase">Batal</button>
+                <button onClick={async () => {
+                  const res = await fetch(`https://skpi-stikomelrahma.my.id/backend/api/admin/kelola_prodi.php?aksi=simpan`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formProdi)
+                  });
+                  if ((await res.json()).status === 'sukses') { setShowModalProdi(false); ambilProdi(); Swal.fire('Tersimpan!', '', 'success'); }
                 }} className="w-2/3 bg-blue-600 text-white py-5 rounded-3xl font-black uppercase">Simpan</button>
               </div>
             </div>
@@ -428,6 +493,36 @@ const PanelStatus = ({ dataStatus, bukaEdit, setFormStatus, setShowModalStatus, 
           <div className="flex gap-2">
             <button onClick={() => bukaEdit(st)} className="p-2.5 bg-white text-amber-500 rounded-xl shadow-sm border border-amber-50 hover:bg-amber-50 transition-colors" title="Edit Status"><Edit3 size={14} /></button>
             <button onClick={() => handleHapus(st.id_status)} className="p-2.5 bg-white text-red-500 rounded-xl shadow-sm border border-red-50 hover:bg-red-50 transition-colors" title="Hapus Status"><Trash2 size={14} /></button>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+const PanelProdi = ({ dataProdi, bukaEdit, setFormProdi, setShowModalProdi, handleHapus }) => (
+  <div className="bg-white p-8 md:p-10 rounded-[3rem] shadow-sm border border-gray-100 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-4xl mx-auto">
+    <div className="flex justify-between items-center mb-6">
+      <h4 className="font-black text-blue-900 uppercase italic flex items-center gap-3"><AlignLeft className="text-blue-600" /> Master Program Studi</h4>
+      <button onClick={() => { setFormProdi({ id_prodi: '', nama_prodi: '', jenjang: 'S1', gelar_lulusan: '', masa_studi_tahun: 4 }); setShowModalProdi(true); }} className="bg-blue-100 text-blue-700 px-4 py-2 rounded-xl font-black text-[10px] uppercase hover:bg-blue-600 hover:text-white transition-colors">
+        + Tambah
+      </button>
+    </div>
+    <div className="space-y-3">
+      {dataProdi.map(pr => (
+        <div key={pr.id_prodi} className="flex flex-col md:flex-row justify-between items-start md:items-center p-5 bg-gray-50 rounded-3xl border border-gray-100 gap-4">
+          <div>
+            <div className="flex items-center gap-3">
+              <p className="font-black text-blue-900 text-sm uppercase">{pr.nama_prodi}</p>
+              <span className="px-3 py-1 rounded-full text-[9px] font-black uppercase bg-blue-100 text-blue-700">
+                {pr.jenjang}
+              </span>
+            </div>
+            <p className="text-xs text-gray-500 font-medium mt-1">Gelar: <span className="font-bold">{pr.gelar_lulusan}</span> • Masa Studi: <span className="font-bold">{pr.masa_studi_tahun} Tahun</span></p>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={() => bukaEdit(pr)} className="p-2.5 bg-white text-amber-500 rounded-xl shadow-sm border border-amber-50 hover:bg-amber-50 transition-colors" title="Edit Prodi"><Edit3 size={14} /></button>
+            <button onClick={() => handleHapus(pr.id_prodi)} className="p-2.5 bg-white text-red-500 rounded-xl shadow-sm border border-red-50 hover:bg-red-50 transition-colors" title="Hapus Prodi"><Trash2 size={14} /></button>
           </div>
         </div>
       ))}

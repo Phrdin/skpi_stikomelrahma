@@ -32,13 +32,17 @@ try {
                     a.tahun as angkatan_tahun,
                     p.sandi_mentah,
                     s.nama_status as status_mahasiswa_text,
+                    pr.nama_prodi as program_studi,
+                    pr.gelar_lulusan as gelar,
+                    pr.jenjang,
                     (SELECT IFNULL(SUM(poin), 0) 
                      FROM kegiatan_mahasiswa 
                      WHERE nomor_induk = m.nomor_induk AND status_validasi = 'disetujui') as total_poin
                 FROM mahasiswa m 
                 LEFT JOIN angkatan a ON m.id_angkatan = a.id
                 LEFT JOIN pengguna p ON m.nomor_induk = p.nomor_induk
-                LEFT JOIN master_status_mahasiswa s ON m.id_status = s.id_status";
+                LEFT JOIN master_status_mahasiswa s ON m.id_status = s.id_status
+                LEFT JOIN master_prodi pr ON m.id_prodi = pr.id_prodi";
         
         $conditions = [];
         $params = [];
@@ -112,7 +116,11 @@ try {
             $nama = isset($row[1]) ? trim($row[1]) : ''; 
             $pass = isset($row[2]) ? trim($row[2]) : '';
             
-            $prodi = !empty($row[3]) ? trim($row[3]) : null;
+            $prodi_str = !empty($row[3]) ? trim($row[3]) : '';
+            $stmtP = $pdo->prepare("SELECT id_prodi FROM master_prodi WHERE nama_prodi LIKE ? LIMIT 1");
+            $stmtP->execute(["%$prodi_str%"]);
+            $id_prodi = $stmtP->fetchColumn() ?: 1;
+
             $tempat_lahir = !empty($row[4]) ? trim($row[4]) : null;
             $tgl_lahir = !empty($row[5]) ? trim($row[5]) : null;
             $jk = !empty($row[6]) ? trim($row[6]) : null;
@@ -123,27 +131,27 @@ try {
             $alamat = !empty($row[11]) ? trim($row[11]) : null;
             $sem_aktif = (!empty($row[12]) && is_numeric($row[12])) ? trim($row[12]) : null;
             $thn_lulus = !empty($row[13]) ? trim($row[13]) : null;
-            $gelar = !empty($row[14]) ? trim($row[14]) : null;
+            // $row[14] is Gelar, ignored because it's from master_prodi
 
             // Simpan Profil
             $sql_mahasiswa = "INSERT INTO mahasiswa (
                 nomor_induk, nama_lengkap, id_angkatan, angkatan, 
-                program_studi, tempat_lahir, tanggal_lahir, jenis_kelamin, 
-                agama, nik, no_hp, email, alamat, semester_aktif, semester_berjalan, tahun_lulus, gelar
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
+                id_prodi, tempat_lahir, tanggal_lahir, jenis_kelamin, 
+                agama, nik, no_hp, email, alamat, semester_aktif, semester_berjalan, tahun_lulus
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
             ON DUPLICATE KEY UPDATE 
                 nama_lengkap=?, id_angkatan=?, angkatan=?, 
-                program_studi=?, tempat_lahir=?, tanggal_lahir=?, jenis_kelamin=?, 
-                agama=?, nik=?, no_hp=?, email=?, alamat=?, semester_aktif=?, semester_berjalan=?, tahun_lulus=?, gelar=?";
+                id_prodi=?, tempat_lahir=?, tanggal_lahir=?, jenis_kelamin=?, 
+                agama=?, nik=?, no_hp=?, email=?, alamat=?, semester_aktif=?, semester_berjalan=?, tahun_lulus=?";
                 
             $params_mahasiswa = [
                 $nim, $nama, $id_angkatan_pilihan, $thn,
-                $prodi, $tempat_lahir, $tgl_lahir, $jk,
-                $agama, $nik, $no_hp, $email, $alamat, $sem_aktif, $sem_aktif, $thn_lulus, $gelar,
+                $id_prodi, $tempat_lahir, $tgl_lahir, $jk,
+                $agama, $nik, $no_hp, $email, $alamat, $sem_aktif, $sem_aktif, $thn_lulus,
                 // Update params
                 $nama, $id_angkatan_pilihan, $thn,
-                $prodi, $tempat_lahir, $tgl_lahir, $jk,
-                $agama, $nik, $no_hp, $email, $alamat, $sem_aktif, $sem_aktif, $thn_lulus, $gelar
+                $id_prodi, $tempat_lahir, $tgl_lahir, $jk,
+                $agama, $nik, $no_hp, $email, $alamat, $sem_aktif, $sem_aktif, $thn_lulus
             ];
             
             $pdo->prepare($sql_mahasiswa)->execute($params_mahasiswa);
@@ -176,7 +184,7 @@ try {
         $nama = $input['nama_lengkap'] ?? '';
         $id_akt = $input['id_angkatan'] ?? ''; 
         
-        $prodi = $input['program_studi'] ?? null;
+        $id_prodi = $input['id_prodi'] ?? 1;
         $tempat_lahir = $input['tempat_lahir'] ?? null;
         $tgl_lahir = $input['tanggal_lahir'] ?? null;
         if (empty($tgl_lahir)) $tgl_lahir = null;
@@ -189,8 +197,7 @@ try {
         $agama = $input['agama'] ?? null;
         $sem_aktif = $input['semester_aktif'] ?? null;
         if ($sem_aktif === '') $sem_aktif = null;
-        $gelar = $input['gelar'] ?? null;
-        $thn_lulus = $input['tahun_lulus'] ?? null;
+        // $gelar = $input['gelar'] ?? null; // Dihitung dari relasi prodi
         $thn_lulus = $input['tahun_lulus'] ?? null;
         $id_status = $input['id_status'] ?? 1; // 1 = Aktif
         $semester_berjalan = $input['semester_berjalan'] ?? ($sem_aktif ?? 1);
@@ -203,21 +210,21 @@ try {
         
         $sql_mahasiswa = "INSERT INTO mahasiswa (
             nomor_induk, nama_lengkap, id_angkatan, angkatan, 
-            program_studi, tempat_lahir, tanggal_lahir, jenis_kelamin, 
-            no_hp, email, alamat, nik, agama, semester_aktif, semester_berjalan, gelar, tahun_lulus, id_status
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
+            id_prodi, tempat_lahir, tanggal_lahir, jenis_kelamin, 
+            no_hp, email, alamat, nik, agama, semester_aktif, semester_berjalan, tahun_lulus, id_status
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
         ON DUPLICATE KEY UPDATE 
             nama_lengkap=?, id_angkatan=?, angkatan=?, 
-            program_studi=?, tempat_lahir=?, tanggal_lahir=?, jenis_kelamin=?, 
-            no_hp=?, email=?, alamat=?, nik=?, agama=?, semester_aktif=?, semester_berjalan=?, gelar=?, tahun_lulus=?, id_status=?";
+            id_prodi=?, tempat_lahir=?, tanggal_lahir=?, jenis_kelamin=?, 
+            no_hp=?, email=?, alamat=?, nik=?, agama=?, semester_aktif=?, semester_berjalan=?, tahun_lulus=?, id_status=?";
             
         $params_mahasiswa = [
             $nim, $nama, $id_akt, $thn,
-            $prodi, $tempat_lahir, $tgl_lahir, $jk,
-            $no_hp, $email, $alamat, $nik, $agama, $sem_aktif, $semester_berjalan, $gelar, $thn_lulus, $id_status,
+            $id_prodi, $tempat_lahir, $tgl_lahir, $jk,
+            $no_hp, $email, $alamat, $nik, $agama, $sem_aktif, $semester_berjalan, $thn_lulus, $id_status,
             $nama, $id_akt, $thn,
-            $prodi, $tempat_lahir, $tgl_lahir, $jk,
-            $no_hp, $email, $alamat, $nik, $agama, $sem_aktif, $semester_berjalan, $gelar, $thn_lulus, $id_status
+            $id_prodi, $tempat_lahir, $tgl_lahir, $jk,
+            $no_hp, $email, $alamat, $nik, $agama, $sem_aktif, $semester_berjalan, $thn_lulus, $id_status
         ];
         
         $pdo->prepare($sql_mahasiswa)->execute($params_mahasiswa);

@@ -14,10 +14,15 @@ try {
         $stmtAkt = $pdo->query("SELECT id, tahun, nama_angkatan FROM angkatan WHERE status_aktif = 1 ORDER BY tahun DESC");
         $angkatan = $stmtAkt->fetchAll(PDO::FETCH_ASSOC);
 
+        // 3. Ambil Data Prodi
+        $stmtProdi = $pdo->query("SELECT id_prodi, nama_prodi, jenjang, gelar_lulusan, masa_studi_tahun FROM master_prodi ORDER BY id_prodi ASC");
+        $prodi = $stmtProdi->fetchAll(PDO::FETCH_ASSOC);
+
         echo json_encode([
             "status" => "sukses",
             "semester" => $semester,
-            "angkatan" => $angkatan
+            "angkatan" => $angkatan,
+            "prodi" => $prodi
         ]);
         exit;
     }

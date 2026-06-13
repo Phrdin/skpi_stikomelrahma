@@ -21,11 +21,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
         // 2. Ambil Biodata Mahasiswa
         $stmtMhs = $pdo->prepare("SELECT p.nomor_induk, p.nama_lengkap, 
-                                  m.program_studi, m.angkatan, m.tempat_lahir, m.tanggal_lahir, 
+                                  pr.nama_prodi as program_studi, m.angkatan, m.tempat_lahir, m.tanggal_lahir, 
                                   m.jenis_kelamin, m.no_hp, m.alamat, m.nik, m.agama, m.foto_formal,
-                                  m.gelar, m.tahun_lulus
+                                  pr.gelar_lulusan as gelar, m.tahun_lulus
                                   FROM pengguna p
                                   LEFT JOIN mahasiswa m ON p.nomor_induk = m.nomor_induk
+                                  LEFT JOIN master_prodi pr ON m.id_prodi = pr.id_prodi
                                   WHERE p.nomor_induk = ?");
         $stmtMhs->execute([$nim_target]);
         $biodata = $stmtMhs->fetch(PDO::FETCH_ASSOC);

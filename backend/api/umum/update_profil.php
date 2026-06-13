@@ -18,10 +18,12 @@ if ($method === 'GET') {
 
     $nim = $_GET['nim'] ?? '';
     try {
-        $sql = "SELECT p.nama_lengkap, m.*, s.nama_status as status_mahasiswa_text 
+        $sql = "SELECT p.nama_lengkap, m.*, s.nama_status as status_mahasiswa_text, 
+                       pr.nama_prodi as program_studi, pr.gelar_lulusan as gelar 
                 FROM pengguna p 
                 LEFT JOIN mahasiswa m ON p.nomor_induk = m.nomor_induk 
                 LEFT JOIN master_status_mahasiswa s ON m.id_status = s.id_status
+                LEFT JOIN master_prodi pr ON m.id_prodi = pr.id_prodi
                 WHERE p.nomor_induk = ?";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$nim]);
