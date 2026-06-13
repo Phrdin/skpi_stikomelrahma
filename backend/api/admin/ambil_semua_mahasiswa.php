@@ -137,21 +137,21 @@ try {
             $sql_mahasiswa = "INSERT INTO mahasiswa (
                 nomor_induk, nama_lengkap, id_angkatan, angkatan, 
                 id_prodi, tempat_lahir, tanggal_lahir, jenis_kelamin, 
-                agama, nik, no_hp, email, alamat, semester_aktif, semester_berjalan, tahun_lulus
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
+                agama, nik, no_hp, email, alamat, semester_aktif, tahun_lulus
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
             ON DUPLICATE KEY UPDATE 
                 nama_lengkap=?, id_angkatan=?, angkatan=?, 
                 id_prodi=?, tempat_lahir=?, tanggal_lahir=?, jenis_kelamin=?, 
-                agama=?, nik=?, no_hp=?, email=?, alamat=?, semester_aktif=?, semester_berjalan=?, tahun_lulus=?";
+                agama=?, nik=?, no_hp=?, email=?, alamat=?, semester_aktif=?, tahun_lulus=?";
                 
             $params_mahasiswa = [
                 $nim, $nama, $id_angkatan_pilihan, $thn,
                 $id_prodi, $tempat_lahir, $tgl_lahir, $jk,
-                $agama, $nik, $no_hp, $email, $alamat, $sem_aktif, $sem_aktif, $thn_lulus,
+                $agama, $nik, $no_hp, $email, $alamat, $sem_aktif, $thn_lulus,
                 // Update params
                 $nama, $id_angkatan_pilihan, $thn,
                 $id_prodi, $tempat_lahir, $tgl_lahir, $jk,
-                $agama, $nik, $no_hp, $email, $alamat, $sem_aktif, $sem_aktif, $thn_lulus
+                $agama, $nik, $no_hp, $email, $alamat, $sem_aktif, $thn_lulus
             ];
             
             $pdo->prepare($sql_mahasiswa)->execute($params_mahasiswa);
@@ -211,20 +211,20 @@ try {
         $sql_mahasiswa = "INSERT INTO mahasiswa (
             nomor_induk, nama_lengkap, id_angkatan, angkatan, 
             id_prodi, tempat_lahir, tanggal_lahir, jenis_kelamin, 
-            no_hp, email, alamat, nik, agama, semester_aktif, semester_berjalan, tahun_lulus, id_status
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
+            no_hp, email, alamat, nik, agama, semester_aktif, tahun_lulus, id_status
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
         ON DUPLICATE KEY UPDATE 
             nama_lengkap=?, id_angkatan=?, angkatan=?, 
             id_prodi=?, tempat_lahir=?, tanggal_lahir=?, jenis_kelamin=?, 
-            no_hp=?, email=?, alamat=?, nik=?, agama=?, semester_aktif=?, semester_berjalan=?, tahun_lulus=?, id_status=?";
+            no_hp=?, email=?, alamat=?, nik=?, agama=?, semester_aktif=?, tahun_lulus=?, id_status=?";
             
         $params_mahasiswa = [
             $nim, $nama, $id_akt, $thn,
             $id_prodi, $tempat_lahir, $tgl_lahir, $jk,
-            $no_hp, $email, $alamat, $nik, $agama, $sem_aktif, $semester_berjalan, $thn_lulus, $id_status,
+            $no_hp, $email, $alamat, $nik, $agama, $sem_aktif, $thn_lulus, $id_status,
             $nama, $id_akt, $thn,
             $id_prodi, $tempat_lahir, $tgl_lahir, $jk,
-            $no_hp, $email, $alamat, $nik, $agama, $sem_aktif, $semester_berjalan, $thn_lulus, $id_status
+            $no_hp, $email, $alamat, $nik, $agama, $sem_aktif, $thn_lulus, $id_status
         ];
         
         $pdo->prepare($sql_mahasiswa)->execute($params_mahasiswa);
