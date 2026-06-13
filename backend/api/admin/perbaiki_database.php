@@ -83,6 +83,29 @@ try {
         $relasi_berhasil++;
     }
 
+    // FK Kegiatan Mahasiswa -> Kategori
+    if (!checkFKExists($pdo, 'kegiatan_mahasiswa', 'fk_kegiatan_kategori')) {
+        $pdo->exec("ALTER TABLE kegiatan_mahasiswa ADD CONSTRAINT fk_kegiatan_kategori FOREIGN KEY (id_master_kategori) REFERENCES master_kategori_skpi(id_master_kategori) ON DELETE RESTRICT ON UPDATE CASCADE");
+        $relasi_berhasil++;
+    }
+
+    // FK Pengguna -> Mahasiswa dibatalkan karena admin dan super_admin tidak ada di tabel mahasiswa
+    // Sehingga akan menyebabkan error foreign key constraint fails.
+
+    // FK Permohonan SKPI -> Mahasiswa
+    if (!checkFKExists($pdo, 'permohonan_cetak_skpi', 'fk_permohonan_mahasiswa')) {
+        $pdo->exec("ALTER TABLE permohonan_cetak_skpi ADD CONSTRAINT fk_permohonan_mahasiswa FOREIGN KEY (nomor_induk) REFERENCES mahasiswa(nomor_induk) ON DELETE CASCADE ON UPDATE CASCADE");
+        $relasi_berhasil++;
+    }
+
+    // FK Log Sistem -> Pengguna
+    if (!checkFKExists($pdo, 'log_sistem', 'fk_log_pengguna')) {
+        // Hapus data log yang usernya sudah dihapus agar tidak orphan
+        $pdo->exec("DELETE FROM log_sistem WHERE id_pengguna NOT IN (SELECT id FROM pengguna)");
+        $pdo->exec("ALTER TABLE log_sistem ADD CONSTRAINT fk_log_pengguna FOREIGN KEY (id_pengguna) REFERENCES pengguna(id) ON DELETE CASCADE ON UPDATE CASCADE");
+        $relasi_berhasil++;
+    }
+
     echo "ANALISIS & PERBAIKAN SELESAI:<br>";
     echo "- Kolom usang dihapus (program_studi, gelar, semester_berjalan).<br>";
     echo "- Kolom relasi dipastikan ada (id_prodi, id_status).<br>";
