@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState, useCallback } from 'react';
 import { KonteksPengguna } from '../../context/InfoPengguna';
 import { Eye, Edit3, X, Loader2, UploadCloud, AlertCircle, FileSearch, Clock, CheckCircle2, XCircle, Calendar, Award, Save } from 'lucide-react';
 import Swal from 'sweetalert2';
+import ActionMenu from '../../components/ActionMenu';
 
 const StatusAjuan = () => {
   const { pengguna } = useContext(KonteksPengguna);
@@ -198,18 +199,20 @@ const StatusAjuan = () => {
                        <StatusBadge status={item.status_validasi} />
                     </td>
                     <td className="px-6 py-4 text-right">
-                       <div className="flex items-center justify-end gap-2">
-                          <button onClick={() => { setTarget(item); setShowDetail(true); }} className="p-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors flex items-center gap-2 text-xs font-semibold">
-                            <Eye size={16} /> Detail
-                          </button>
-                          {item.status_validasi && (item.status_validasi.toLowerCase() === 'menunggu' || item.status_validasi.toLowerCase() === 'revisi') && (
-                            <button 
-                              onClick={() => bukaModalEdit(item)}
-                              className="p-2 text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors flex items-center gap-2 text-xs font-semibold"
-                            >
-                              <Edit3 size={16} /> Edit
+                       <div className="flex items-center justify-end">
+                          <ActionMenu>
+                            <button onClick={() => { setTarget(item); setShowDetail(true); }} className="flex items-center gap-2 text-blue-600">
+                              <Eye size={16} /> Detail
                             </button>
-                          )}
+                            {item.status_validasi && (item.status_validasi.toLowerCase() === 'menunggu' || item.status_validasi.toLowerCase() === 'revisi') && (
+                              <button 
+                                onClick={() => bukaModalEdit(item)}
+                                className="flex items-center gap-2 text-amber-600"
+                              >
+                                <Edit3 size={16} /> Edit
+                              </button>
+                            )}
+                          </ActionMenu>
                        </div>
                     </td>
                   </tr>

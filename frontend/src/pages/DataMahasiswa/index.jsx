@@ -275,21 +275,23 @@ const DataMahasiswa = () => {
                         <div className="text-emerald-500 font-bold mt-1 text-xs">{m.total_poin} Poin SKPI</div>
                     </td>
                     <td className="py-4 px-4 text-center">
-                        <div className="flex items-center justify-center gap-3">
-                            <button onClick={() => { setDataLihat(m); setShowLihatModal(true); }} className="text-sky-500 hover:text-sky-600 transition-colors" title="Lihat Profil">
-                                <Eye size={16} strokeWidth={2.5} />
-                            </button>
-                            <button onClick={() => { setForm({...m, is_edit: true}); setShowModal(true); }} className="text-amber-500 hover:text-amber-600 transition-colors" title="Edit Data">
-                                <Pencil size={16} strokeWidth={2.5} />
-                            </button>
-                            <button onClick={() => handleHapus(m.nomor_induk, m.nama_lengkap)} className="text-red-500 hover:text-red-600 transition-colors" title="Hapus User">
-                                <Trash2 size={16} strokeWidth={2.5} />
-                            </button>
-                            {parseInt(m.total_poin || 0) >= 250 && (
-                                <button onClick={() => window.open(`/cetak-draft/${m.nomor_induk}`, '_blank')} className="text-emerald-500 hover:text-emerald-600 transition-colors" title="Cetak Draft SKPI">
-                                    <Printer size={16} strokeWidth={2.5} />
+                        <div className="flex items-center justify-center">
+                            <ActionMenu>
+                                <button onClick={() => { setDataLihat(m); setShowLihatModal(true); }} className="flex items-center gap-2 text-sky-600">
+                                    <Eye size={16} /> Lihat Profil
                                 </button>
-                            )}
+                                <button onClick={() => { setForm({...m, is_edit: true}); setShowModal(true); }} className="flex items-center gap-2 text-amber-600">
+                                    <Pencil size={16} /> Edit Data
+                                </button>
+                                <button onClick={() => handleHapus(m.nomor_induk, m.nama_lengkap)} className="flex items-center gap-2 text-red-600">
+                                    <Trash2 size={16} /> Hapus User
+                                </button>
+                                {parseInt(m.total_poin || 0) >= 250 && (
+                                    <button onClick={() => window.open(`/cetak-draft/${m.nomor_induk}`, '_blank')} className="flex items-center gap-2 text-emerald-600">
+                                        <Printer size={16} /> Cetak Draft SKPI
+                                    </button>
+                                )}
+                            </ActionMenu>
                         </div>
                     </td>
                     </tr>

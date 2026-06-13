@@ -1,6 +1,7 @@
 import React from 'react';
 import Sidebar from '../../components/Sidebar';
 import ActionMenu from '../../components/ActionMenu';
+import { Edit3, KeyRound, Trash2 } from 'lucide-react';
 
 const KelolaPengguna = () => {
   return (
@@ -37,9 +38,9 @@ const KelolaPengguna = () => {
                   </td>
                   <td className="p-3 text-center relative">
                     <ActionMenu>
-                        <button className="text-blue-600">Edit Pengguna</button>
-                        <button className="text-yellow-600">Reset Sandi</button>
-                        <button className="text-red-600">Hapus Akun</button>
+                        <button className="flex items-center gap-2 text-blue-600"><Edit3 size={16}/> Edit Pengguna</button>
+                        <button className="flex items-center gap-2 text-yellow-600"><KeyRound size={16}/> Reset Sandi</button>
+                        <button className="flex items-center gap-2 text-red-600"><Trash2 size={16}/> Hapus Akun</button>
                     </ActionMenu>
                   </td>
                 </tr>
@@ -53,9 +54,9 @@ const KelolaPengguna = () => {
                   </td>
                   <td className="p-3 text-center relative">
                     <ActionMenu>
-                        <button className="text-blue-600">Edit Pengguna</button>
-                        <button className="text-yellow-600">Reset Sandi</button>
-                        <button className="text-red-600">Hapus Akun</button>
+                        <button className="flex items-center gap-2 text-blue-600"><Edit3 size={16}/> Edit Pengguna</button>
+                        <button className="flex items-center gap-2 text-yellow-600"><KeyRound size={16}/> Reset Sandi</button>
+                        <button className="flex items-center gap-2 text-red-600"><Trash2 size={16}/> Hapus Akun</button>
                     </ActionMenu>
                   </td>
                 </tr>

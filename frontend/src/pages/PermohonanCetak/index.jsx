@@ -193,42 +193,43 @@ const PermohonanCetak = () => {
                       </span>
                     </td>
                     <td className="py-4 px-4 text-center">
-                        <div className="flex flex-wrap items-center justify-center gap-3">
-                          {item.status !== 'Selesai' ? (
-                            <>
-                                <button onClick={() => navigate(`/cetak-draft/${item.nomor_induk}`)} className="text-blue-600 hover:text-blue-600 transition-colors" title="Cetak Draft">
-                                  <Printer size={16} strokeWidth={2.5}/>
+                        <div className="flex justify-center">
+                          <ActionMenu>
+                            {item.status !== 'Selesai' ? (
+                              <>
+                                <button onClick={() => navigate(`/cetak-draft/${item.nomor_induk}`)} className="flex items-center gap-2 text-blue-600">
+                                  <Printer size={16} /> Cetak Draft
                                 </button>
                                 {item.foto_formal && (
-                                  <button onClick={() => handleDownloadFoto(item.foto_formal, item.nomor_induk)} className="text-purple-500 hover:text-purple-600 transition-colors" title="Download Foto">
-                                    <ImageIcon size={16} strokeWidth={2.5}/>
+                                  <button onClick={() => handleDownloadFoto(item.foto_formal, item.nomor_induk)} className="flex items-center gap-2 text-purple-600">
+                                    <ImageIcon size={16} /> Download Foto
                                   </button>
                                 )}
-                                <button onClick={() => handleBukaUpload(item)} className="text-emerald-500 hover:text-emerald-600 transition-colors" title="Upload Scan Final">
-                                  <UploadCloud size={16} strokeWidth={2.5}/>
+                                <button onClick={() => handleBukaUpload(item)} className="flex items-center gap-2 text-emerald-600">
+                                  <UploadCloud size={16} /> Upload Scan Final
                                 </button>
-                            </>
-                          ) : (
-                            <>
-                                <span className="text-emerald-500 font-bold text-xs flex items-center mr-2"><CheckCircle size={14} className="mr-1" strokeWidth={2.5}/> Selesai</span>
-                                <button onClick={() => navigate(`/cetak-draft/${item.nomor_induk}`)} className="text-blue-600 hover:text-blue-600 transition-colors" title="Cetak Draft">
-                                  <Printer size={16} strokeWidth={2.5}/>
+                              </>
+                            ) : (
+                              <>
+                                <button onClick={() => navigate(`/cetak-draft/${item.nomor_induk}`)} className="flex items-center gap-2 text-blue-600">
+                                  <Printer size={16} /> Cetak Draft
                                 </button>
                                 {item.foto_formal && (
-                                  <button onClick={() => handleDownloadFoto(item.foto_formal, item.nomor_induk)} className="text-purple-500 hover:text-purple-600 transition-colors" title="Download Foto">
-                                    <ImageIcon size={16} strokeWidth={2.5}/>
+                                  <button onClick={() => handleDownloadFoto(item.foto_formal, item.nomor_induk)} className="flex items-center gap-2 text-purple-600">
+                                    <ImageIcon size={16} /> Download Foto
                                   </button>
                                 )}
                                 {item.file_scan_skpi && (
-                                  <button onClick={() => handleDownloadFile(item.file_scan_skpi, item.nomor_induk)} className="text-sky-500 hover:text-sky-600 transition-colors" title="Download Asli">
-                                    <Download size={16} strokeWidth={2.5}/>
+                                  <button onClick={() => handleDownloadFile(item.file_scan_skpi, item.nomor_induk)} className="flex items-center gap-2 text-sky-600">
+                                    <Download size={16} /> Download Asli
                                   </button>
                                 )}
-                                <button onClick={() => handleBukaUpload(item)} className="text-emerald-500 hover:text-emerald-600 transition-colors" title="Upload Ulang / Ganti Scan Final">
-                                  <UploadCloud size={16} strokeWidth={2.5}/>
+                                <button onClick={() => handleBukaUpload(item)} className="flex items-center gap-2 text-emerald-600">
+                                  <UploadCloud size={16} /> Upload Ulang Scan
                                 </button>
-                            </>
-                          )}
+                              </>
+                            )}
+                          </ActionMenu>
                         </div>
                     </td>
                   </tr>

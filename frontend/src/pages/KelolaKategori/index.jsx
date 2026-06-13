@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import { FileSpreadsheet, Download, Plus, Info, X, Trash2, Edit3, Loader2 } from 'lucide-react';
+import ActionMenu from '../../components/ActionMenu';
 
 const KelolaKategori = () => {
   const [data, setData] = useState([]);
@@ -269,13 +270,15 @@ const KelolaKategori = () => {
                         {item.bobot}
                       </div>
                     </td>
-                    <td className="p-4 flex gap-2">
-                      <button onClick={() => handleEdit(item)} className="p-2 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-xl transition-all">
-                        <Edit3 size={14} />
-                      </button>
-                      <button onClick={() => handleHapus(item.id_master_kategori)} className="p-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-xl transition-all">
-                        <Trash2 size={14} />
-                      </button>
+                    <td className="p-4 flex justify-center gap-2">
+                      <ActionMenu>
+                        <button onClick={() => handleEdit(item)} className="flex items-center gap-2 text-blue-600">
+                          <Edit3 size={16} /> Edit Kategori
+                        </button>
+                        <button onClick={() => handleHapus(item.id_master_kategori)} className="flex items-center gap-2 text-red-600">
+                          <Trash2 size={16} /> Hapus Kategori
+                        </button>
+                      </ActionMenu>
                     </td>
                   </tr>
                 ))}

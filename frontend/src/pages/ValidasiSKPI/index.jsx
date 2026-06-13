@@ -169,23 +169,24 @@ const ValidasiSKPI = () => {
                       </span>
                     </td>
                     <td className="py-4 px-4 text-center">
-                      <div className="flex items-center justify-center gap-2.5">
-                        <button onClick={() => {setTargetItem(item); setShowBerkas(true);}} className="text-sky-500 hover:text-sky-600 transition-colors" title="Pratinjau Berkas">
-                          <Eye size={18} strokeWidth={2.5}/>
-                        </button>
-                        <button onClick={() => {setTargetItem(item); setShowDetail(true);}} className="text-gray-500 hover:text-gray-600 transition-colors" title="Lihat Detail">
-                          <FileText size={18} strokeWidth={2.5}/>
-                        </button>
-                        <div className="w-px h-5 bg-gray-200 mx-1"></div>
-                        <button onClick={() => tanganiValidasi(item.id, 'Disetujui')} className="text-emerald-500 hover:text-emerald-600 transition-colors" title="Setujui Pengajuan">
-                          <CheckCircle size={18} strokeWidth={2.5}/>
-                        </button>
-                        <button onClick={() => tanganiValidasi(item.id, 'Revisi')} className="text-amber-500 hover:text-amber-600 transition-colors" title="Minta Revisi">
-                          <AlertCircle size={18} strokeWidth={2.5}/>
-                        </button>
-                        <button onClick={() => tanganiValidasi(item.id, 'Ditolak')} className="text-red-500 hover:text-red-600 transition-colors" title="Tolak Pengajuan">
-                          <XCircle size={18} strokeWidth={2.5}/>
-                        </button>
+                      <div className="flex justify-center">
+                        <ActionMenu>
+                          <button onClick={() => {setTargetItem(item); setShowBerkas(true);}} className="flex items-center gap-2 text-sky-600">
+                            <Eye size={16} /> Pratinjau Berkas
+                          </button>
+                          <button onClick={() => {setTargetItem(item); setShowDetail(true);}} className="flex items-center gap-2 text-gray-600">
+                            <FileText size={16} /> Lihat Detail
+                          </button>
+                          <button onClick={() => tanganiValidasi(item.id, 'Disetujui')} className="flex items-center gap-2 text-emerald-600">
+                            <CheckCircle size={16} /> Setujui Pengajuan
+                          </button>
+                          <button onClick={() => tanganiValidasi(item.id, 'Revisi')} className="flex items-center gap-2 text-amber-600">
+                            <AlertCircle size={16} /> Minta Revisi
+                          </button>
+                          <button onClick={() => tanganiValidasi(item.id, 'Ditolak')} className="flex items-center gap-2 text-red-600">
+                            <XCircle size={16} /> Tolak Pengajuan
+                          </button>
+                        </ActionMenu>
                       </div>
                     </td>
                   </tr>
