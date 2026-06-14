@@ -146,7 +146,7 @@ const DataMahasiswa = () => {
     const headers = [[
       'NIM', 'Nama Lengkap', 'Password', 'Program Studi', 'Tempat Lahir', 
       'Tanggal Lahir (YYYY-MM-DD)', 'Jenis Kelamin', 'Agama', 'NIK', 'No. HP', 
-      'Email', 'Alamat', 'Semester Aktif', 'Tahun Lulus', 'Gelar'
+      'Email', 'Alamat', 'Semester Aktif', 'Target Lulus', 'Gelar'
     ]];
     const worksheet = XLSX.utils.aoa_to_sheet(headers);
     const workbook = XLSX.utils.book_new();
@@ -459,7 +459,7 @@ const DataMahasiswa = () => {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-2">Tahun Lulus</label>
+                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-2">Target Lulus</label>
                       <input type="text" placeholder="Otomatis" className="w-full p-4 bg-gray-100 text-gray-500 rounded-2xl font-bold outline-none border-2 border-transparent text-sm cursor-not-allowed" value={form.tahun_lulus || ''} disabled readOnly />
                     </div>
                     <div>

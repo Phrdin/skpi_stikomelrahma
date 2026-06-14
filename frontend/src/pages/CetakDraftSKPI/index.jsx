@@ -11,6 +11,21 @@ const CetakDraftSKPI = () => {
   const [dataSKPI, setDataSKPI] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [scale, setScale] = useState(1);
+  
+  useEffect(() => {
+    const handleResize = () => {
+      const w = window.innerWidth;
+      if (w < 850) {
+        setScale((w - 40) / 794);
+      } else {
+        setScale(1);
+      }
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   
   const targetPdfRef = useRef();
 
@@ -166,8 +181,7 @@ const CetakDraftSKPI = () => {
       {/* KONTAINER UNTUK RENDER PDF */}
       <div className="flex flex-col items-start lg:items-center gap-12 bg-gray-100 p-4 md:p-8 rounded-3xl overflow-x-auto relative max-w-full" ref={targetPdfRef}>
         
-        {/* ======================= HALAMAN 1 : BIODATA ======================= */}
-        <div className="pdf-page bg-white shadow-2xl relative shrink-0 overflow-hidden" style={{ width: '794px', height: '1123px' }}>
+        <div className="pdf-page bg-white shadow-2xl relative shrink-0 overflow-hidden" style={{ width: '794px', height: '1123px', transform: `scale(${scale})`, transformOrigin: 'top center', marginBottom: `-${1123 * (1 - scale)}px` }}>
           <img src={dataSKPI.pengaturan?.skpi_background1_image ? `https://skpi-stikomelrahma.my.id/backend/api/umum/proxy_gambar.php?file=template_skpi/${dataSKPI.pengaturan.skpi_background1_image}` : "/bg_skpi_1.jpg"} alt="Background SKPI 1" className="absolute inset-0 w-full h-full object-cover z-0" crossOrigin="anonymous" />
           <div className="absolute inset-0 z-10">
             <div className="absolute" style={getPos('skpi_pos_nomor', { top: 125, left: 470 })}>
@@ -230,7 +244,7 @@ const CetakDraftSKPI = () => {
             const isLastPage = pageIndex === chunks.length - 1;
 
             return (
-              <div key={`page-2-${pageIndex}`} className="pdf-page bg-white shadow-2xl relative shrink-0 overflow-hidden" style={{ width: '794px', height: '1123px' }}>
+              <div key={`page-2-${pageIndex}`} className="pdf-page bg-white shadow-2xl relative shrink-0 overflow-hidden" style={{ width: '794px', height: '1123px', transform: `scale(${scale})`, transformOrigin: 'top center', marginBottom: `-${1123 * (1 - scale)}px` }}>
                 <img src={dataSKPI.pengaturan?.skpi_background2_image ? `https://skpi-stikomelrahma.my.id/backend/api/umum/proxy_gambar.php?file=template_skpi/${dataSKPI.pengaturan.skpi_background2_image}` : "/bg_skpi_2.jpg"} alt={`Background 2 Page ${pageIndex}`} className="absolute inset-0 w-full h-full object-cover z-0" crossOrigin="anonymous" />
                 <div className="absolute inset-0 z-10">
                   <div className="absolute" style={getPos('skpi_pos_nomor', { top: 125, left: 470 })}>

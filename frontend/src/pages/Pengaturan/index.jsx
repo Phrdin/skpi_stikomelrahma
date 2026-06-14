@@ -51,7 +51,6 @@ const Pengaturan = () => {
     skpi_pos_foto: '',
     skpi_pos_tabel: '',
     skpi_pos_ttd: '',
-    skpi_pos_ttd: '',
     skpi_panduan_file: '',
     panduan_admin_teks: ''
   });
@@ -905,7 +904,7 @@ const VisualEditor = ({ settings, setSettings, onSave, loading }) => {
               {renderItem('skpi_pos_ttl', <p className="font-bold text-gray-900 text-[15px] uppercase whitespace-nowrap">[TEMPAT, TANGGAL LAHIR]</p>)}
               {renderItem('skpi_pos_prodi', <p className="font-bold text-gray-900 text-[15px] uppercase">[PROGRAM STUDI]</p>)}
               {renderItem('skpi_pos_gelar', <p className="font-bold text-gray-900 text-[15px] uppercase">[GELAR]</p>)}
-              {renderItem('skpi_pos_lulus', <p className="font-bold text-gray-900 text-[15px] uppercase">[TAHUN LULUS]</p>)}
+              {renderItem('skpi_pos_lulus', <p className="font-bold text-gray-900 text-[15px] uppercase">[TARGET LULUS]</p>)}
             </>
           ) : (
             <>

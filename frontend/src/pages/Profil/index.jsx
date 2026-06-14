@@ -243,7 +243,7 @@ useEffect(() => {
               <InfoRow ikon={<Shield size={18}/>} label="Agama" nilai={profil.agama || '-'} />
               <InfoRow ikon={<Shield size={18}/>} label="Jenis Kelamin" nilai={profil.jenis_kelamin || '-'} />
               <InfoRow ikon={<GraduationCap size={18}/>} label="Gelar Akademik" nilai={profil.gelar || '-'} />
-              <InfoRow ikon={<Calendar size={18}/>} label="Tahun Lulus" nilai={profil.tahun_lulus || '-'} />
+              <InfoRow ikon={<Calendar size={18}/>} label="Target Lulus" nilai={profil.tahun_lulus || '-'} />
               <InfoRow ikon={<Phone size={18}/>} label="WhatsApp" nilai={profil.no_hp || '-'} />
               <InfoRow ikon={<Mail size={18}/>} label="Email" nilai={profil.email || '-'} />
             </div>
@@ -324,7 +324,7 @@ useEffect(() => {
                 <InputGroup label="Tempat Lahir" name="tempat_lahir" value={formData.tempat_lahir} disabled />
                 <InputGroup label="Tgl Lahir" name="tanggal_lahir" type="date" value={formData.tanggal_lahir} disabled />
                 <InputGroup label="Gelar (S.Kom/dll)" name="gelar" value={formData.gelar || ''} disabled />
-                <InputGroup label="Estimasi Tahun Lulus" name="tahun_lulus" value={formData.tahun_lulus || ''} disabled />
+                <InputGroup label="Estimasi Target Lulus" name="tahun_lulus" value={formData.tahun_lulus || ''} disabled />
                 <InputGroup label="WhatsApp" name="no_hp" value={formData.no_hp} onChange={handleChange} required />
                 <InputGroup label="Email" name="email" type="email" value={formData.email} onChange={handleChange} required />
               </div>

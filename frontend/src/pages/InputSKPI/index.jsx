@@ -418,7 +418,7 @@ const InputSKPI = () => {
             </div>
             <div className="flex-1 bg-gray-50 p-4 overflow-hidden relative">
               <iframe 
-                src={`https://skpi-stikomelrahma.my.id/backend/unggahan/panduan_skpi/${panduanFile}`} 
+                src={`https://skpi-stikomelrahma.my.id/backend/api/umum/proxy_gambar.php?file=panduan_skpi/${panduanFile}`} 
                 className="w-full h-full rounded-xl border border-gray-200 bg-white"
                 title="Panduan SKPI"
               />
