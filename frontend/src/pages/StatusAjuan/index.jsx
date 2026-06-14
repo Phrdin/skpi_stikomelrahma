@@ -8,6 +8,8 @@ const StatusAjuan = () => {
   const { pengguna } = useContext(KonteksPengguna);
   const [daftarAjuan, setDaftarAjuan] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const limit = 10;
   
   const [showDetail, setShowDetail] = useState(false);
   const [showBerkas, setShowBerkas] = useState(false);
@@ -188,9 +190,9 @@ const StatusAjuan = () => {
               {loading ? (
                 <tr><td colSpan="4" className="p-16 text-center animate-pulse"><Loader2 size={24} className="animate-spin text-blue-600 mx-auto" /></td></tr>
               ) : daftarAjuan.length > 0 ? (
-                daftarAjuan.map((item, index) => (
+                daftarAjuan.slice((currentPage - 1) * limit, currentPage * limit).map((item, index) => (
                   <tr key={item.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-all">
-                    <td className="px-6 py-4 text-center font-medium text-gray-400">{index + 1}</td>
+                    <td className="px-6 py-4 text-center font-medium text-gray-400">{(currentPage - 1) * limit + index + 1}</td>
                     <td className="px-6 py-4">
                       <div className="font-bold text-gray-800">{item.judul_kegiatan}</div>
                       <div className="text-xs text-blue-600 font-semibold mt-1">Kredit: {item.poin}</div>
@@ -223,6 +225,30 @@ const StatusAjuan = () => {
             </tbody>
           </table>
         </div>
+        {/* Pagination Controls */}
+        {Math.ceil(daftarAjuan.length / limit) > 1 && (
+          <div className="flex flex-col sm:flex-row justify-between items-center px-6 py-4 border-t border-gray-100 bg-gray-50/50 gap-4">
+            <span className="text-xs font-semibold text-gray-500">
+              Menampilkan {(currentPage - 1) * limit + 1} - {Math.min(currentPage * limit, daftarAjuan.length)} dari {daftarAjuan.length} Riwayat Ajuan
+            </span>
+            <div className="flex gap-2">
+              <button 
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 rounded-xl border border-gray-200 bg-white text-gray-600 text-xs font-bold disabled:opacity-50 hover:bg-gray-50 transition-colors shadow-sm"
+              >
+                Sebelahnya
+              </button>
+              <button 
+                onClick={() => setCurrentPage(p => Math.min(Math.ceil(daftarAjuan.length / limit), p + 1))}
+                disabled={currentPage === Math.ceil(daftarAjuan.length / limit)}
+                className="px-4 py-2 rounded-xl border border-gray-200 bg-white text-gray-600 text-xs font-bold disabled:opacity-50 hover:bg-gray-50 transition-colors shadow-sm"
+              >
+                Selanjutnya
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* MODAL EDIT FULL */}

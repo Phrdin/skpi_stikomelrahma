@@ -3,7 +3,7 @@ import { KonteksPengguna } from '../../context/InfoPengguna';
 import Swal from 'sweetalert2';
 import {
   Calendar, GraduationCap, ShieldCheck, Lock, Save,
-  RefreshCcw, Trash2, Plus, Users, Edit3, X,
+  RefreshCcw, Trash2, Plus, Users, Edit3, X, Info,
   FileText, Signature, Image as ImageIcon, Loader2, AlertCircle,
   AlignLeft, AlignCenter, AlignRight, Bold, Type, Palette, ArrowLeftToLine, ArrowRightToLine
 } from 'lucide-react';
@@ -51,7 +51,9 @@ const Pengaturan = () => {
     skpi_pos_foto: '',
     skpi_pos_tabel: '',
     skpi_pos_ttd: '',
-    skpi_panduan_file: ''
+    skpi_pos_ttd: '',
+    skpi_panduan_file: '',
+    panduan_admin_teks: ''
   });
   const [loadingSKPI, setLoadingSKPI] = useState(false);
 
@@ -116,7 +118,8 @@ const Pengaturan = () => {
           skpi_pos_foto: hasil.data.skpi_pos_foto || '',
           skpi_pos_tabel: hasil.data.skpi_pos_tabel || '',
           skpi_pos_ttd: hasil.data.skpi_pos_ttd || '',
-          skpi_panduan_file: hasil.data.skpi_panduan_file || ''
+          skpi_panduan_file: hasil.data.skpi_panduan_file || '',
+          panduan_admin_teks: hasil.data.panduan_admin_teks || ''
         });
       }
     } catch (err) { console.error("Gagal ambil pengaturan SKPI"); }
@@ -238,6 +241,7 @@ const Pengaturan = () => {
         <TabButton aktif={tabAktif === 'status'} onClick={() => setTabAktif('status')} ikon={<Users size={18} />} label="Status Mahasiswa" />
         <TabButton aktif={tabAktif === 'periode'} onClick={() => setTabAktif('periode')} ikon={<Calendar size={18} />} label="Periode Sinkronisasi" />
         <TabButton aktif={tabAktif === 'skpi'} onClick={() => setTabAktif('skpi')} ikon={<FileText size={18} />} label="SKPI Resmi" />
+        <TabButton aktif={tabAktif === 'panduan'} onClick={() => setTabAktif('panduan')} ikon={<Info size={18} />} label="Panduan Admin" />
         <TabButton aktif={tabAktif === 'keamanan'} onClick={() => setTabAktif('keamanan')} ikon={<Lock size={18} />} label="Ganti Password" />
       </div>
 
@@ -275,6 +279,14 @@ const Pengaturan = () => {
             onUploadTemplate={handleUploadTemplate}
             onUploadPanduan={handleUploadPanduan}
             loading={loadingSKPI}
+          />
+        )}
+        {tabAktif === 'panduan' && (
+          <PanelPanduan 
+            settings={skpiSettings} 
+            setSettings={setSkpiSettings} 
+            onSave={simpanPengaturanSKPI} 
+            loading={loadingSKPI} 
           />
         )}
         {tabAktif === 'status' && (
@@ -1091,6 +1103,36 @@ const PanelKeamanan = ({ pengguna }) => {
           >
             {loading ? <Loader2 size={18} className="animate-spin" /> : <RefreshCcw size={18} />} 
             {loading ? 'Menyimpan...' : 'Update Password'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const PanelPanduan = ({ settings, setSettings, onSave, loading }) => {
+  return (
+    <div className="max-w-3xl mx-auto">
+      <div className="bg-white p-8 md:p-10 rounded-[3rem] shadow-sm border border-gray-100">
+        <h3 className="text-2xl font-black text-blue-900 uppercase italic mb-6">Panduan Admin</h3>
+        <p className="text-xs font-medium text-gray-500 mb-6">Teks ini akan muncul jika Admin menekan tombol Panduan Penggunaan di sidebar/header.</p>
+        <div className="space-y-4">
+          <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-2">Isi Panduan Penggunaan</label>
+          <textarea
+            className="w-full h-[400px] p-5 bg-gray-50 rounded-3xl font-medium text-sm text-gray-700 outline-none focus:ring-2 focus:ring-blue-600 shadow-inner resize-none"
+            placeholder="Ketik panduan penggunaan untuk admin di sini..."
+            value={settings.panduan_admin_teks || ''}
+            onChange={(e) => setSettings({ ...settings, panduan_admin_teks: e.target.value })}
+          />
+        </div>
+        <div className="mt-8">
+          <button 
+            onClick={onSave} 
+            disabled={loading} 
+            className="w-full bg-blue-600 text-white py-4 rounded-3xl font-black uppercase shadow-xl hover:bg-blue-700 transition-all flex items-center justify-center gap-2"
+          >
+            {loading ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+            Simpan Panduan Admin
           </button>
         </div>
       </div>

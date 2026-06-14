@@ -10,6 +10,9 @@ const ValidasiSKPI = () => {
   const [antrean, setAntrean] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pencarian, setPencarian] = useState("");
+  const [filterAngkatan, setFilterAngkatan] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const limit = 10;
   
   const [showDetail, setShowDetail] = useState(false);
   const [showBerkas, setShowBerkas] = useState(false);
@@ -89,10 +92,17 @@ const ValidasiSKPI = () => {
     }
   };
 
-  const dataFilter = Array.isArray(antrean) ? antrean.filter(item => 
-    (item.nama_lengkap || "").toLowerCase().includes(pencarian.toLowerCase()) ||
-    (item.nomor_induk || "").includes(pencarian)
-  ) : [];
+  const opsiAngkatan = [...new Set(antrean.map(a => a.nama_angkatan).filter(Boolean))];
+
+  const dataFilter = Array.isArray(antrean) ? antrean.filter(item => {
+    const matchCari = (item.nama_lengkap || "").toLowerCase().includes(pencarian.toLowerCase()) || (item.nomor_induk || "").includes(pencarian);
+    const matchAngkatan = filterAngkatan ? item.nama_angkatan === filterAngkatan : true;
+    return matchCari && matchAngkatan;
+  }) : [];
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [pencarian, filterAngkatan]);
 
   if (loading && antrean.length === 0) {
     return (
@@ -118,7 +128,20 @@ const ValidasiSKPI = () => {
         </div>
 
         {/* Toolbar Filter EDOM Style */}
-        <div className="flex w-full md:w-auto gap-3">
+        <div className="flex flex-col md:flex-row w-full md:w-auto gap-3">
+          <div className="relative w-full md:w-48">
+            <select 
+              className="w-full pl-4 pr-10 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-600 outline-none focus:border-blue-600 appearance-none transition-all"
+              value={filterAngkatan}
+              onChange={(e) => setFilterAngkatan(e.target.value)}
+            >
+              <option value="">Semua Angkatan</option>
+              {opsiAngkatan.map((angkatan, idx) => (
+                <option key={idx} value={angkatan}>{angkatan}</option>
+              ))}
+            </select>
+            <Filter className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+          </div>
           <div className="relative flex-1 md:w-64">
             <input 
               type="text" 
@@ -143,6 +166,7 @@ const ValidasiSKPI = () => {
               <tr>
                 <th className="py-4 px-4 text-center w-16">No</th>
                 <th className="py-4 px-4">Pengaju</th>
+                <th className="py-4 px-4">Angkatan</th>
                 <th className="py-4 px-4">Informasi Kegiatan</th>
                 <th className="py-4 px-4 text-center">Kredit</th>
                 <th className="py-4 px-4 text-center w-48">Aksi & Validasi</th>
@@ -150,15 +174,20 @@ const ValidasiSKPI = () => {
             </thead>
             <tbody className="text-sm text-gray-700">
               {dataFilter.length > 0 ? (
-                dataFilter.map((item, i) => (
+                dataFilter.slice((currentPage - 1) * limit, currentPage * limit).map((item, i) => (
                   <tr key={item.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
-                    <td className="py-4 px-4 text-center font-medium text-gray-500">{i + 1}</td>
+                    <td className="py-4 px-4 text-center font-medium text-gray-500">{(currentPage - 1) * limit + i + 1}</td>
                     <td className="py-4 px-4">
                       <div className="font-semibold text-gray-800">{item.nama_lengkap}</div>
                       <div className="flex items-center gap-1.5 text-gray-500 text-xs mt-0.5">
                         <User size={12} className="text-gray-400" />
                         {item.nomor_induk}
                       </div>
+                    </td>
+                    <td className="py-4 px-4">
+                      <span className="inline-block px-3 py-1 bg-gray-100 text-gray-600 rounded-lg text-xs font-semibold">
+                        {item.nama_angkatan || '-'}
+                      </span>
                     </td>
                     <td className="py-4 px-4">
                       <p className="font-medium text-gray-700 leading-tight">{item.judul_kegiatan}</p>
@@ -202,6 +231,30 @@ const ValidasiSKPI = () => {
             </tbody>
           </table>
         </div>
+        {/* Pagination Controls */}
+        {Math.ceil(dataFilter.length / limit) > 1 && (
+          <div className="flex flex-col sm:flex-row justify-between items-center px-6 py-4 border-t border-gray-100 bg-gray-50/50 gap-4">
+            <span className="text-xs font-semibold text-gray-500">
+              Menampilkan {(currentPage - 1) * limit + 1} - {Math.min(currentPage * limit, dataFilter.length)} dari {dataFilter.length} Ajuan
+            </span>
+            <div className="flex gap-2">
+              <button 
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 rounded-xl border border-gray-200 bg-white text-gray-600 text-xs font-bold disabled:opacity-50 hover:bg-gray-50 transition-colors shadow-sm"
+              >
+                Sebelahnya
+              </button>
+              <button 
+                onClick={() => setCurrentPage(p => Math.min(Math.ceil(dataFilter.length / limit), p + 1))}
+                disabled={currentPage === Math.ceil(dataFilter.length / limit)}
+                className="px-4 py-2 rounded-xl border border-gray-200 bg-white text-gray-600 text-xs font-bold disabled:opacity-50 hover:bg-gray-50 transition-colors shadow-sm"
+              >
+                Selanjutnya
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* MODAL BERKAS */}

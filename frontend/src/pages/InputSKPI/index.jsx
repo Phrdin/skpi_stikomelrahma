@@ -60,9 +60,21 @@ const InputSKPI = () => {
       } catch (err) {}
     };
 
+    const fetchSemesterAktif = async () => {
+      if (!pengguna?.nomor_induk) return;
+      try {
+        const res = await fetch(`https://skpi-stikomelrahma.my.id/backend/api/umum/ambil_ringkasan.php?nim=${pengguna.nomor_induk}&peran=${pengguna.peran}`);
+        const hasil = await res.json();
+        if (hasil.status === 'sukses' && hasil.data.semester_aktif) {
+          setFormData(prev => ({ ...prev, semester_ditempuh: hasil.data.semester_aktif }));
+        }
+      } catch (err) {}
+    };
+
     fetchMaster();
     fetchPanduan();
-  }, []);
+    fetchSemesterAktif();
+  }, [pengguna]);
 
   // 2. Logika Dropdown Bertingkat (Dependent Dropdown)
   useEffect(() => {
@@ -159,6 +171,10 @@ const InputSKPI = () => {
         body: dataKirim,
       });
       
+      if (!response.ok) {
+        throw new Error(`HTTP Error: ${response.status}`);
+      }
+      
       const hasil = await response.json();
       if (hasil.status === 'sukses') {
         Swal.fire({
@@ -172,10 +188,32 @@ const InputSKPI = () => {
         setFileSertifikat(null);
         setPreviewUrl(null);
       } else {
-        Swal.fire('Gagal', hasil.pesan, 'error');
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal Menyimpan',
+          text: hasil.pesan || 'Data tidak dapat disimpan. Silakan periksa kembali isian form Anda.',
+          confirmButtonColor: '#ef4444'
+        });
       }
     } catch (error) {
-      Swal.fire('Error', 'Terjadi kesalahan pada server.', 'error');
+      console.error(error);
+      let pesanError = 'Terjadi kesalahan tidak terduga pada server. Coba lagi beberapa saat.';
+      if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+          pesanError = 'Gagal terhubung ke server. Periksa koneksi internet Anda atau server sedang gangguan.';
+      } else if (error.message.includes('JSON')) {
+          pesanError = 'Respon server tidak valid. Mungkin ukuran file terlalu besar (batas server PHP) atau terjadi maintenance.';
+      } else if (error.message.includes('HTTP Error: 413')) {
+          pesanError = 'File sertifikat yang Anda unggah terlalu besar melebihi batas maksimal server.';
+      } else if (error.message.includes('HTTP Error:')) {
+          pesanError = 'Terjadi kesalahan saat mengunggah: ' + error.message;
+      }
+      
+      Swal.fire({
+        icon: 'error',
+        title: 'Gagal Upload/Koneksi',
+        text: pesanError,
+        confirmButtonColor: '#ef4444'
+      });
     } finally {
       setLoading(false);
     }
@@ -250,13 +288,25 @@ const InputSKPI = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-semibold text-gray-500 uppercase ml-1">Kategori Utama</label>
-                <select className="w-full p-3 bg-white border border-gray-200 rounded-xl font-medium text-sm outline-none focus:border-blue-600 transition-all"
-                  value={formData.kategori_utama} onChange={(e) => setFormData({...formData, kategori_utama: e.target.value})}>
-                  <option value="">-- Pilih Kategori --</option>
-                  {opsiKategori.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                <label className="text-xs font-semibold text-gray-500 uppercase ml-1">Semester Ditempuh</label>
+                <select 
+                  className="w-full p-3 bg-white border border-gray-200 rounded-xl font-medium text-sm outline-none focus:border-blue-600 transition-all"
+                  value={formData.semester_ditempuh} 
+                  onChange={(e) => setFormData({...formData, semester_ditempuh: parseInt(e.target.value)})}
+                  required
+                >
+                  {[1,2,3,4,5,6,7,8].map(s => <option key={s} value={s}>Semester {s}</option>)}
                 </select>
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-gray-500 uppercase ml-1">Kategori Utama</label>
+              <select className="w-full p-3 bg-white border border-gray-200 rounded-xl font-medium text-sm outline-none focus:border-blue-600 transition-all"
+                value={formData.kategori_utama} onChange={(e) => setFormData({...formData, kategori_utama: e.target.value})}>
+                <option value="">-- Pilih Kategori --</option>
+                {opsiKategori.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+              </select>
             </div>
 
             <div className="space-y-2">
@@ -318,7 +368,10 @@ const InputSKPI = () => {
               ) : (
                 <div className="flex flex-col items-center gap-3">
                   <CloudUpload size={36} className="text-gray-400 group-hover:text-blue-600 transition-colors" />
-                  <span className="text-xs font-medium text-gray-500 text-center px-4">Pilih file sertifikat<br/>(JPG/PNG/PDF)</span>
+                  <span className="text-xs font-medium text-gray-500 text-center px-4">
+                    Pilih file sertifikat<br/>(JPG/PNG/PDF)<br/>
+                    <span className="text-[10px] text-blue-500 font-bold mt-1 inline-block">* Maksimal 10 MB</span>
+                  </span>
                 </div>
               )}
               <input type="file" className="absolute inset-0 opacity-0 cursor-pointer" onChange={handleFileChange} accept=".jpg,.jpeg,.png,.pdf" />

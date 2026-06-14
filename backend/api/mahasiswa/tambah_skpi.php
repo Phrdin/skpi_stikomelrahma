@@ -63,13 +63,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if (move_uploaded_file($file['tmp_name'], $tujuan)) {
                 
+                $semester_ditempuh = isset($_POST['semester_ditempuh']) ? $_POST['semester_ditempuh'] : 1;
+
                 // 2. Simpan ke database
                 $sql = "INSERT INTO kegiatan_mahasiswa 
-                        (nomor_induk, id_master_kategori, judul_kegiatan, file_bukti, status_validasi, poin, waktu_pelaksanaan) 
-                        VALUES (?, ?, ?, ?, 'Menunggu', ?, ?)";
+                        (nomor_induk, id_master_kategori, judul_kegiatan, file_bukti, status_validasi, poin, waktu_pelaksanaan, semester_ditempuh) 
+                        VALUES (?, ?, ?, ?, 'Menunggu', ?, ?, ?)";
                 
                 $stmt = $pdo->prepare($sql);
-                $stmt->execute([$nim, $id_master, $judul, $nama_file_baru, $poin, $waktu_pelaksanaan]);
+                $stmt->execute([$nim, $id_master, $judul, $nama_file_baru, $poin, $waktu_pelaksanaan, $semester_ditempuh]);
 
                 echo json_encode(["status" => "sukses", "pesan" => "Alhamdulillah, ajuan berhasil dikirim!"]);
             } else {

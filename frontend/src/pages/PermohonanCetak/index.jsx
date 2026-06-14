@@ -10,6 +10,8 @@ const PermohonanCetak = () => {
   const [antrean, setAntrean] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pencarian, setPencarian] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const limit = 10;
   const navigate = useNavigate();
 
   const [showUpload, setShowUpload] = useState(false);
@@ -129,10 +131,14 @@ const PermohonanCetak = () => {
     }
   };
 
-  const dataFilter = Array.isArray(antrean) ? antrean.filter(item => 
-    (item.nama_lengkap || "").toLowerCase().includes(pencarian.toLowerCase()) ||
-    (item.nomor_induk || "").includes(pencarian)
-  ) : [];
+  const dataFilter = antrean.filter(item => 
+    item.nama_lengkap?.toLowerCase().includes(pencarian.toLowerCase()) ||
+    item.nomor_induk?.toLowerCase().includes(pencarian.toLowerCase())
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [pencarian]);
 
   return (
     <div className="animate-in fade-in duration-500 pb-20">
@@ -177,9 +183,9 @@ const PermohonanCetak = () => {
               {loading ? (
                 <tr><td colSpan="5" className="p-12 text-center text-gray-500 animate-pulse font-medium">Memuat data...</td></tr>
               ) : dataFilter.length > 0 ? (
-                dataFilter.map((item, i) => (
+                dataFilter.slice((currentPage - 1) * limit, currentPage * limit).map((item, i) => (
                   <tr key={item.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
-                    <td className="py-4 px-4 text-center font-medium text-gray-500">{i + 1}</td>
+                    <td className="py-4 px-4 text-center font-medium text-gray-500">{(currentPage - 1) * limit + i + 1}</td>
                     <td className="py-4 px-4">
                       <div className="font-semibold text-gray-800">{item.nama_lengkap}</div>
                       <div className="text-gray-500 text-xs">{item.nomor_induk}</div>
@@ -244,6 +250,30 @@ const PermohonanCetak = () => {
             </tbody>
           </table>
         </div>
+        {/* Pagination Controls */}
+        {Math.ceil(dataFilter.length / limit) > 1 && (
+          <div className="flex flex-col sm:flex-row justify-between items-center px-6 py-4 border-t border-gray-100 bg-gray-50/50 gap-4">
+            <span className="text-xs font-semibold text-gray-500">
+              Menampilkan {(currentPage - 1) * limit + 1} - {Math.min(currentPage * limit, dataFilter.length)} dari {dataFilter.length} Permohonan
+            </span>
+            <div className="flex gap-2">
+              <button 
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 rounded-xl border border-gray-200 bg-white text-gray-600 text-xs font-bold disabled:opacity-50 hover:bg-gray-50 transition-colors shadow-sm"
+              >
+                Sebelahnya
+              </button>
+              <button 
+                onClick={() => setCurrentPage(p => Math.min(Math.ceil(dataFilter.length / limit), p + 1))}
+                disabled={currentPage === Math.ceil(dataFilter.length / limit)}
+                className="px-4 py-2 rounded-xl border border-gray-200 bg-white text-gray-600 text-xs font-bold disabled:opacity-50 hover:bg-gray-50 transition-colors shadow-sm"
+              >
+                Selanjutnya
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* MODAL UPLOAD FINAL */}

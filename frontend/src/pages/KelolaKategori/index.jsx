@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
-import { FileSpreadsheet, Download, Plus, Info, X, Trash2, Edit3, Loader2 } from 'lucide-react';
+import { FileSpreadsheet, Download, Plus, Info, X, Trash2, Edit3, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import ActionMenu from '../../components/ActionMenu';
 
 const KelolaKategori = () => {
@@ -11,6 +11,8 @@ const KelolaKategori = () => {
   const [showGuide, setShowGuide] = useState(false);
   const [opsiKategori, setOpsiKategori] = useState([]);
   const [kategoriLainnya, setKategoriLainnya] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const limit = 10;
   const [form, setForm] = useState({ 
     id_master_kategori: null, 
     kategori_utama: '', 
@@ -238,58 +240,87 @@ const KelolaKategori = () => {
         {loading ? (
           <div className="flex justify-center p-10"><Loader2 className="animate-spin text-blue-600" size={40} /></div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b-2 border-gray-100">
-                  <th className="p-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Kategori Utama</th>
-                  <th className="p-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Nama Kegiatan</th>
-                  <th className="p-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Tingkat & Partisipasi</th>
-                  <th className="p-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Bobot</th>
-                  <th className="p-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Aksi</th>
-                </tr>
-              </thead>
-              <tbody className="text-sm font-medium">
-                {data.map((item, idx) => (
-                  <tr key={idx} className="border-b border-gray-50 hover:bg-blue-50/50 transition-colors">
-                    <td className="p-4">
-                      <span className="inline-block px-3 py-1 bg-blue-50 text-blue-600 rounded-xl text-[10px] font-bold">
-                        {item.kategori_utama}
-                      </span>
-                    </td>
-                    <td className="p-4 font-bold text-gray-700">{item.nama_kegiatan}</td>
-                    <td className="p-4">
-                      <div className="text-xs text-gray-500">
-                        {item.tingkat && <span className="font-semibold text-gray-700">{item.tingkat}</span>}
-                        {item.tingkat && item.partisipasi && ' - '}
-                        {item.partisipasi && <span>{item.partisipasi}</span>}
-                      </div>
-                    </td>
-                    <td className="p-4">
-                      <div className="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center font-black text-xs">
-                        {item.bobot}
-                      </div>
-                    </td>
-                    <td className="p-4 flex justify-center gap-2">
-                      <ActionMenu>
-                        <button onClick={() => handleEdit(item)} className="flex items-center gap-2 text-blue-600">
-                          <Edit3 size={16} /> Edit Kategori
-                        </button>
-                        <button onClick={() => handleHapus(item.id_master_kategori)} className="flex items-center gap-2 text-red-600">
-                          <Trash2 size={16} /> Hapus Kategori
-                        </button>
-                      </ActionMenu>
-                    </td>
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b-2 border-gray-100">
+                    <th className="p-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Kategori Utama</th>
+                    <th className="p-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Nama Kegiatan</th>
+                    <th className="p-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Tingkat & Partisipasi</th>
+                    <th className="p-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Bobot</th>
+                    <th className="p-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Aksi</th>
                   </tr>
-                ))}
-                {data.length === 0 && (
-                  <tr>
-                    <td colSpan="5" className="p-10 text-center text-gray-400 font-bold">Belum ada data kategori. Silakan upload CSV atau tambah manual.</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="text-sm font-medium">
+                  {data.slice((currentPage - 1) * limit, currentPage * limit).map((item, idx) => (
+                    <tr key={idx} className="border-b border-gray-50 hover:bg-blue-50/50 transition-colors">
+                      <td className="p-4">
+                        <span className="inline-block px-3 py-1 bg-blue-50 text-blue-600 rounded-xl text-[10px] font-bold">
+                          {item.kategori_utama}
+                        </span>
+                      </td>
+                      <td className="p-4 font-bold text-gray-700">{item.nama_kegiatan}</td>
+                      <td className="p-4">
+                        <div className="text-xs text-gray-500">
+                          {item.tingkat && <span className="font-semibold text-gray-700">{item.tingkat}</span>}
+                          {item.tingkat && item.partisipasi && ' - '}
+                          {item.partisipasi && <span>{item.partisipasi}</span>}
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <div className="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center font-black text-xs">
+                          {item.bobot}
+                        </div>
+                      </td>
+                      <td className="p-4 flex justify-center gap-2">
+                        <ActionMenu>
+                          <button onClick={() => handleEdit(item)} className="flex items-center gap-2 text-blue-600">
+                            <Edit3 size={16} /> Edit Kategori
+                          </button>
+                          <button onClick={() => handleHapus(item.id_master_kategori)} className="flex items-center gap-2 text-red-600">
+                            <Trash2 size={16} /> Hapus Kategori
+                          </button>
+                        </ActionMenu>
+                      </td>
+                    </tr>
+                  ))}
+                  {data.length === 0 && (
+                    <tr>
+                      <td colSpan="5" className="p-10 text-center text-gray-400 font-bold">Belum ada data kategori. Silakan upload CSV atau tambah manual.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+            {/* Pagination Controls */}
+            {Math.ceil(data.length / limit) > 1 && (
+              <div className="flex flex-col sm:flex-row justify-between items-center px-6 py-4 border-t border-gray-100 bg-gray-50/50 gap-4">
+                <span className="text-xs font-semibold text-gray-500">
+                  Menampilkan {(currentPage - 1) * limit + 1} - {Math.min(currentPage * limit, data.length)} dari {data.length} Kategori
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="p-2 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+                  <span className="text-xs font-bold text-blue-600 bg-blue-50 px-4 py-2 rounded-xl">
+                    {currentPage} / {Math.ceil(data.length / limit)}
+                  </span>
+                  <button
+                    onClick={() => setCurrentPage(p => Math.min(Math.ceil(data.length / limit), p + 1))}
+                    disabled={currentPage === Math.ceil(data.length / limit)}
+                    className="p-2 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    <ChevronRight size={16} />
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
 

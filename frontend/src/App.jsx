@@ -23,6 +23,7 @@ import Pengaturan from './pages/Pengaturan';
 import KelolaKategori from './pages/KelolaKategori';
 import PermohonanCetak from './pages/PermohonanCetak';
 import CetakDraftSKPI from './pages/CetakDraftSKPI';
+import PanduanAdmin from './pages/PanduanAdmin';
 
 function App() {
   return (
@@ -55,6 +56,7 @@ function App() {
                   <Route path="/kategori" element={<KelolaKategori />} />
                   <Route path="/permohonan-cetak" element={<PermohonanCetak />} />
                   <Route path="/cetak-draft/:nim" element={<CetakDraftSKPI />} />
+                  <Route path="/panduan-admin" element={<PanduanAdmin />} />
 
                   {/* Fallback */}
                   <Route path="*" element={<Navigate to="/beranda" replace />} />

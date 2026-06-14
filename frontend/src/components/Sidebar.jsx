@@ -130,8 +130,9 @@ const Sidebar = () => {
               <MenuLink to="/permohonan-cetak" icon={Printer}>Permohonan Cetak</MenuLink>
               <MenuLink to="/kategori" icon={Database}>Master Kategori</MenuLink>
               <MenuLink to="/data-mahasiswa" icon={Users}>Data Mahasiswa</MenuLink>
-              <p className="text-[9px] text-blue-400/50 mt-6 mb-4 ml-2 font-black tracking-[0.3em] uppercase">Sistem</p>
+              <p className="text-[9px] text-blue-400/50 mt-6 mb-4 ml-2 font-black tracking-[0.3em] uppercase">Sistem & Bantuan</p>
               <MenuLink to="/pengaturan" icon={Settings}>Pengaturan</MenuLink>
+              <MenuLink to="/panduan-admin" icon={FileText}>Panduan Admin</MenuLink>
             </div>
           )}
         </nav>

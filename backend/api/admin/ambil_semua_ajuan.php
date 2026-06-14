@@ -19,9 +19,11 @@ $method = $_SERVER['REQUEST_METHOD'];
 if ($method === 'GET') {
     try {
         // Ambil data yang masih berstatus 'menunggu'
-        $sql = "SELECT k.*, p.nama_lengkap, m.kategori_utama, m.tingkat, m.partisipasi 
+        $sql = "SELECT k.*, p.nama_lengkap, m.kategori_utama, m.tingkat, m.partisipasi, a.nama_angkatan, a.id as id_angkatan 
                 FROM kegiatan_mahasiswa k
                 JOIN pengguna p ON k.nomor_induk = p.nomor_induk
+                LEFT JOIN mahasiswa mhs ON k.nomor_induk = mhs.nomor_induk
+                LEFT JOIN angkatan a ON mhs.id_angkatan = a.id
                 LEFT JOIN master_kategori_skpi m ON k.id_master_kategori = m.id_master_kategori
                 WHERE LOWER(k.status_validasi) = 'menunggu'
                 ORDER BY k.id ASC";

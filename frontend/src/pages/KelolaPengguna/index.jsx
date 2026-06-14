@@ -17,8 +17,8 @@ const KelolaPengguna = () => {
             </button>
           </div>
           
-          <div className="overflow-visible pb-32">
-            <table className="w-full text-left border-collapse">
+          <div className="overflow-x-auto pb-32">
+            <table className="w-full text-left border-collapse min-w-[700px]">
               <thead>
                 <tr className="bg-gray-100 text-gray-700">
                   <th className="p-3 border-b-2 font-semibold">NIM / NIP</th>

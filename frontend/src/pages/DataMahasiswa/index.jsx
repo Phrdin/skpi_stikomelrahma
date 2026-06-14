@@ -15,6 +15,7 @@ const DataMahasiswa = () => {
   const [cari, setCari] = useState('');
   const [filtAkt, setFiltAkt] = useState('');
   const [limit, setLimit] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
   
   const [terpilih, setTerpilih] = useState([]);
   const [idAngkatanImport, setIdAngkatanImport] = useState('');
@@ -63,7 +64,10 @@ const DataMahasiswa = () => {
     finally { setLoading(false); }
   };
 
-  useEffect(() => { ambilData(); }, [cari, filtAkt]);
+  useEffect(() => { 
+    ambilData(); 
+    setCurrentPage(1);
+  }, [cari, filtAkt]);
 
   const handleExport = () => {
     const dataExport = daftar.map(m => ({
@@ -226,10 +230,11 @@ const DataMahasiswa = () => {
                     <th className="py-4 px-4 w-12 text-center">
                         <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600 cursor-pointer" 
                         onChange={(e) => {
-                            if (e.target.checked) setTerpilih(daftar.slice(0, limit).map(m => m.nomor_induk));
+                            const currentData = daftar.slice((currentPage - 1) * limit, currentPage * limit);
+                            if (e.target.checked) setTerpilih(currentData.map(m => m.nomor_induk));
                             else setTerpilih([]);
                         }} 
-                        checked={terpilih.length === daftar.slice(0, limit).length && daftar.length > 0} 
+                        checked={terpilih.length === Math.min(limit, daftar.slice((currentPage - 1) * limit, currentPage * limit).length) && daftar.length > 0} 
                         />
                     </th>
                     <th className="py-4 px-4 text-center w-16">No</th>
@@ -243,7 +248,7 @@ const DataMahasiswa = () => {
                 <tbody className="text-sm text-gray-700">
                 {loading ? (
                     <tr><td colSpan="7" className="p-12 text-center text-gray-500 animate-pulse font-medium">Memuat data...</td></tr>
-                ) : daftar.slice(0, limit).map((m, i) => (
+                ) : daftar.slice((currentPage - 1) * limit, currentPage * limit).map((m, i) => (
                     <tr key={i} className={`border-b border-gray-50 hover:bg-gray-50/50 transition-colors ${terpilih.includes(m.nomor_induk) ? 'bg-blue-50/30' : ''}`}>
                     <td className="py-4 px-4 text-center">
                         <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600 cursor-pointer" 
@@ -296,9 +301,36 @@ const DataMahasiswa = () => {
                     </td>
                     </tr>
                 ))}
+                {daftar.length === 0 && !loading && (
+                    <tr><td colSpan="7" className="p-12 text-center text-gray-500 font-medium">Tidak ada data mahasiswa</td></tr>
+                )}
                 </tbody>
             </table>
           </div>
+          {/* Pagination Controls */}
+          {Math.ceil(daftar.length / limit) > 1 && (
+            <div className="flex flex-col sm:flex-row justify-between items-center px-6 py-4 border-t border-gray-100 bg-gray-50/50 gap-4">
+              <span className="text-xs font-semibold text-gray-500">
+                Menampilkan {(currentPage - 1) * limit + 1} - {Math.min(currentPage * limit, daftar.length)} dari {daftar.length} Mahasiswa
+              </span>
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 rounded-xl border border-gray-200 bg-white text-gray-600 text-xs font-bold disabled:opacity-50 hover:bg-gray-50 transition-colors shadow-sm"
+                >
+                  Sebelahnya
+                </button>
+                <button 
+                  onClick={() => setCurrentPage(p => Math.min(Math.ceil(daftar.length / limit), p + 1))}
+                  disabled={currentPage === Math.ceil(daftar.length / limit)}
+                  className="px-4 py-2 rounded-xl border border-gray-200 bg-white text-gray-600 text-xs font-bold disabled:opacity-50 hover:bg-gray-50 transition-colors shadow-sm"
+                >
+                  Selanjutnya
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
       {/* MODAL IMPORT */}
