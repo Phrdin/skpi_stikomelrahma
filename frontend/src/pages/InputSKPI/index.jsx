@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { KonteksPengguna } from '../../context/InfoPengguna';
-import { CloudUpload, FileText, Info, CheckCircle, AlertTriangle, X, Loader2 } from 'lucide-react';
+import { CloudUpload, FileText, Info, CheckCircle, AlertTriangle, X, Loader2, MessageCircle } from 'lucide-react';
 import Swal from 'sweetalert2';
 
 const InputSKPI = () => {
@@ -184,12 +184,25 @@ const InputSKPI = () => {
   if (pengguna && pengguna.izin_akses_skpi == 0) {
     return (
       <div className="animate-in fade-in duration-500 pb-20">
-        <div className="bg-red-50 p-6 rounded-2xl border border-red-200 flex flex-col items-center justify-center text-center mt-10">
-          <AlertTriangle size={64} className="text-red-500 mb-4" />
-          <h2 className="text-2xl font-bold text-red-700 mb-2">Akses Ditolak</h2>
-          <p className="text-red-600 max-w-md">
-            Status Anda saat ini adalah <strong>{pengguna.nama_status || 'Tidak Dikenal'}</strong>. Anda tidak diizinkan untuk menambah ajuan SKPI.
+        <div className="bg-red-50 p-6 md:p-10 rounded-3xl border border-red-200 flex flex-col items-center justify-center text-center mt-10 max-w-2xl mx-auto shadow-sm">
+          <AlertTriangle size={64} className="text-red-500 mb-4 animate-bounce" />
+          <h2 className="text-2xl md:text-3xl font-black text-red-700 mb-2 uppercase italic tracking-tight">Akses Terkunci</h2>
+          <p className="text-red-600 mb-8 leading-relaxed">
+            Status Anda saat ini adalah <strong>{pengguna.nama_status || 'Tidak Dikenal'}</strong>. Akun yang belum aktif atau sedang dalam masa cuti tidak diizinkan untuk menambah ajuan SKPI baru.
           </p>
+          
+          <div className="bg-white p-6 rounded-2xl w-full border border-gray-100 shadow-sm flex flex-col items-center">
+            <h3 className="font-bold text-gray-800 mb-2">Butuh Bantuan?</h3>
+            <p className="text-sm text-gray-500 mb-4">Jika Anda merasa status ini adalah sebuah kesalahan, atau Anda sudah menyelesaikan kewajiban administrasi, silakan hubungi admin akademik kami.</p>
+            <a 
+              href="https://wa.me/6281234567890?text=Halo%20Admin,%20saya%20ingin%20mengaktifkan%20kembali%20status%20SKPI%20saya" 
+              target="_blank" 
+              rel="noreferrer"
+              className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl font-bold uppercase tracking-wider text-xs transition-colors shadow-md hover:shadow-lg"
+            >
+              <MessageCircle size={18} /> Chat Admin via WhatsApp
+            </a>
+          </div>
         </div>
       </div>
     );

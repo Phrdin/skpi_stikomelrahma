@@ -164,7 +164,7 @@ const CetakDraftSKPI = () => {
       </div>
 
       {/* KONTAINER UNTUK RENDER PDF */}
-      <div className="flex flex-col items-center gap-12 bg-gray-100 p-8 rounded-3xl overflow-x-auto relative" ref={targetPdfRef}>
+      <div className="flex flex-col items-start lg:items-center gap-12 bg-gray-100 p-4 md:p-8 rounded-3xl overflow-x-auto relative max-w-full" ref={targetPdfRef}>
         
         {/* ======================= HALAMAN 1 : BIODATA ======================= */}
         <div className="pdf-page bg-white shadow-2xl relative shrink-0 overflow-hidden" style={{ width: '794px', height: '1123px' }}>
