@@ -74,7 +74,7 @@ const KelolaKategori = () => {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h2 className="text-3xl font-black text-blue-900 uppercase tracking-tighter italic">Master Kategori</h2>
-            <p className="text-gray-400 font-bold uppercase text-[9px] tracking-[0.3em]">Pedoman Poin SKPI STIKOM El Rahma</p>
+            <p className="text-gray-400 font-bold uppercase text-[9px] tracking-[0.3em]">Pedoman Kredit SKPI STIKOM El Rahma</p>
           </div>
           <div className="flex gap-3">
             <label className="bg-green-600 text-white px-6 py-4 rounded-2xl font-black cursor-pointer shadow-lg shadow-green-100 hover:scale-105 active:scale-95 transition-all">

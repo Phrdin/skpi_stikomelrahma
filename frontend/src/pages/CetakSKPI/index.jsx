@@ -158,7 +158,7 @@ const CetakSertifikat = () => {
         <div className="bg-white rounded-[3rem] p-20 text-center border border-dashed border-gray-200">
           <AlertCircle size={64} className="mx-auto text-gray-200 mb-6" />
           <h3 className="text-xl font-black text-gray-300 uppercase italic tracking-tighter">Belum ada sertifikat terbit</h3>
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-2">Pastikan poin Anda sudah memenuhi syarat UAS semester ini.</p>
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-2">Pastikan kredit Anda sudah memenuhi syarat UAS semester ini.</p>
         </div>
       )}
 

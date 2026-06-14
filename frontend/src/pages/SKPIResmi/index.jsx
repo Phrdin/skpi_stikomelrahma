@@ -73,7 +73,7 @@ const SKPIResmi = () => {
             Swal.fire({
               icon: 'error',
               title: 'Akses Ditolak',
-              text: 'Poin SKPI Anda belum mencapai 250. Silakan kumpulkan lebih banyak poin.'
+              text: 'Kredit SKPI Anda belum mencapai 250. Silakan kumpulkan lebih banyak kredit.'
             }).then(() => { navigate('/beranda'); });
             return;
           }
@@ -103,7 +103,7 @@ const SKPIResmi = () => {
   const handleAjukanCetak = async () => {
     Swal.fire({
       title: 'Konfirmasi Cetak SKPI',
-      text: 'Poin Anda sudah mencukupi! Sistem akan mengajukan pencetakan dokumen SKPI Resmi ke Layanan Akademik untuk divalidasi dan ditandatangani. Lanjutkan?',
+      text: 'Kredit Anda sudah mencukupi! Sistem akan mengajukan pencetakan dokumen SKPI Resmi ke Layanan Akademik untuk divalidasi dan ditandatangani. Lanjutkan?',
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Ya, Ajukan Cetak!',
@@ -126,7 +126,7 @@ const SKPIResmi = () => {
               icon: 'success',
               confirmButtonColor: '#10b981'
             }).then(() => {
-              const pesanWA = `*PERMOHONAN CETAK SKPI RESMI* 🎓\n\nHalo *Admin Layanan Akademik*,\n\nMahasiswa berikut telah memenuhi syarat Poin SKPI dan memohon pencetakan dokumen resmi:\n• Nama: *${pengguna.nama_lengkap}*\n• NIM: *${pengguna.nomor_induk}*\n• Total Poin: *${dataSKPI.total_poin} PTS*\n\nMohon segera diproses dan divalidasi.\nTerima kasih! 🙏`;
+              const pesanWA = `*PERMOHONAN CETAK SKPI RESMI* 🎓\n\nHalo *Admin Layanan Akademik*,\n\nMahasiswa berikut telah memenuhi syarat Kredit SKPI dan memohon pencetakan dokumen resmi:\n• Nama: *${pengguna.nama_lengkap}*\n• NIM: *${pengguna.nomor_induk}*\n• Total Kredit: *${dataSKPI.total_poin} Kredit*\n\nMohon segera diproses dan divalidasi.\nTerima kasih! 🙏`;
               const urlWA = `https://api.whatsapp.com/send?phone=6287864183121&text=${encodeURIComponent(pesanWA)}`;
               window.open(urlWA, '_blank');
               window.location.reload();
@@ -165,7 +165,7 @@ const SKPIResmi = () => {
             <span className="text-gray-900">Penerbitan SKPI</span>
           </h2>
           <p className="text-sm font-medium text-emerald-600 mt-1 flex items-center gap-1.5">
-             <CheckCircle size={16} className="text-emerald-500"/> Syarat 250 Poin Terpenuhi
+             <CheckCircle size={16} className="text-emerald-500"/> Syarat 250 Kredit Terpenuhi
           </p>
         </div>
         
@@ -331,7 +331,7 @@ const SKPIResmi = () => {
                           <th style={{ width: '130px' }}>Tingkat</th>
                           <th style={{ width: '120px' }}>Partisipasi</th>
                           <th style={{ width: '130px' }}>Waktu Pelaksanaan</th>
-                          <th style={{ width: '60px' }}>Poin</th>
+                          <th style={{ width: '60px' }}>Kredit</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -362,7 +362,7 @@ const SKPIResmi = () => {
                         {isLastPage && dataSKPI.kegiatan.length > 0 && (
                           <tr className="bg-gray-50/80">
                             <td colSpan="5" className="py-2.5 pr-6 text-right font-black uppercase text-sm text-blue-950">
-                              Total Poin SKPI Terkumpul
+                              Total Kredit SKPI Terkumpul
                             </td>
                             <td className="py-2.5 text-center font-black text-lg text-blue-900" style={{ width: '60px' }}>
                               {dataSKPI.total_poin}

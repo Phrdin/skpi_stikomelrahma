@@ -248,7 +248,7 @@ const CetakDraftSKPI = () => {
                           <th style={{ width: '130px' }}>Tingkat</th>
                           <th style={{ width: '120px' }}>Partisipasi</th>
                           <th style={{ width: '130px' }}>Waktu Pelaksanaan</th>
-                          <th style={{ width: '60px' }}>Poin</th>
+                          <th style={{ width: '60px' }}>Kredit</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -270,7 +270,7 @@ const CetakDraftSKPI = () => {
                         }
                         {isLastPage && dataSKPI.kegiatan.length > 0 && (
                           <tr className="bg-gray-50/80">
-                            <td colSpan="5" className="py-2.5 pr-6 text-right font-black uppercase text-sm text-blue-950">Total Poin</td>
+                            <td colSpan="5" className="py-2.5 pr-6 text-right font-black uppercase text-sm text-blue-950">Total Kredit</td>
                             <td className="py-2.5 text-center font-black text-lg text-blue-900" style={{ width: '60px' }}>{dataSKPI.total_poin}</td>
                           </tr>
                         )}

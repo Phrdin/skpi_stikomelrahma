@@ -104,7 +104,7 @@ const InputSKPI = () => {
     setFormData(prev => ({ ...prev, id_master_kategori: '', partisipasi: '', poin: 0 }));
   }, [formData.tingkat, formData.nama_kegiatan, formData.kategori_utama, masterKategori]);
 
-  // 3. Set Poin & ID Master Otomatis Berdasarkan Pilihan Terakhir
+  // 3. Set Kredit & ID Master Otomatis Berdasarkan Pilihan Terakhir
   useEffect(() => {
     const match = masterKategori.find(item => 
       item.kategori_utama === formData.kategori_utama &&
@@ -143,7 +143,7 @@ const InputSKPI = () => {
   const handleSimpan = async (e) => {
     e.preventDefault();
     if (!fileSertifikat) return Swal.fire('Peringatan', 'Sertifikat belum dipilih!', 'warning');
-    if (formData.poin === 0) return Swal.fire('Peringatan', 'Harap lengkapi pilihan kegiatan!', 'warning');
+    if (formData.kredit === 0) return Swal.fire('Peringatan', 'Harap lengkapi pilihan kegiatan!', 'warning');
 
     setLoading(true);
     const dataKirim = new FormData();
@@ -279,7 +279,7 @@ const InputSKPI = () => {
 
             <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 flex justify-between items-center mt-6">
               <div>
-                <p className="text-xs font-semibold text-blue-600 uppercase mb-0.5">Poin yang didapat:</p>
+                <p className="text-xs font-semibold text-blue-600 uppercase mb-0.5">Kredit yang didapat:</p>
                 <p className="text-xs font-medium text-blue-600 italic">Terisi otomatis</p>
               </div>
               <div className="text-3xl font-bold text-blue-700">{formData.poin}</div>
@@ -327,7 +327,7 @@ const InputSKPI = () => {
           <div className="bg-blue-50 p-6 rounded-2xl border border-blue-100 text-blue-900 shadow-sm relative overflow-hidden">
             <h5 className="font-semibold text-sm mb-2 flex items-center gap-2"><Info size={16} className="text-blue-600"/> Petunjuk</h5>
             <p className="text-xs leading-relaxed text-blue-800">
-              Gunakan file asli hasil scan. Pastikan tulisan terbaca jelas agar admin mudah memvalidasi poin Anda.
+              Gunakan file asli hasil scan. Pastikan tulisan terbaca jelas agar admin mudah memvalidasi kredit Anda.
             </p>
           </div>
 
@@ -346,7 +346,7 @@ const InputSKPI = () => {
             <div className="p-6 bg-emerald-50 border-b border-emerald-100 flex justify-between items-center">
               <div className="flex items-center gap-3 text-emerald-800">
                 <FileText size={20} />
-                <h3 className="text-lg font-black uppercase italic">Panduan Bobot Poin SKPI</h3>
+                <h3 className="text-lg font-black uppercase italic">Panduan Bobot Kredit SKPI</h3>
               </div>
               <button onClick={() => setShowPanduan(false)} className="p-2 text-gray-400 hover:bg-white rounded-xl transition-colors hover:text-red-500"><X size={20}/></button>
             </div>

@@ -84,7 +84,7 @@ const DataMahasiswa = () => {
       Tahun_Lulus: m.tahun_lulus || '-',
       Gelar: m.gelar || '-',
       Status_Mahasiswa: m.status_mahasiswa_text || 'Aktif',
-      Total_Poin: m.total_poin || 0
+      Total_Kredit: m.total_poin || 0
     }));
     const worksheet = XLSX.utils.json_to_sheet(dataExport);
     const workbook = XLSX.utils.book_new();
@@ -272,7 +272,7 @@ const DataMahasiswa = () => {
                         <span className="inline-flex items-center justify-center bg-gray-50 text-blue-600 border border-gray-200 px-3 py-1 rounded-md text-xs font-semibold">
                             {m.nama_angkatan || '-'}
                         </span>
-                        <div className="text-emerald-500 font-bold mt-1 text-xs">{m.total_poin} Poin SKPI</div>
+                        <div className="text-emerald-500 font-bold mt-1 text-xs">{m.total_poin} Kredit SKPI</div>
                     </td>
                     <td className="py-4 px-4 text-center">
                         <div className="flex items-center justify-center">

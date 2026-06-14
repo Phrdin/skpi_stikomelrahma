@@ -398,7 +398,7 @@ const KelolaKategori = () => {
                 <li><b>Nama Kegiatan:</b> Rincian kegiatannya (Misal: Pesantren Mahasiswa, Juara 1 Lomba Web).</li>
                 <li><b>Tingkat:</b> Level cakupan kegiatan (Nasional, Internasional, Lokal). Kosongkan jika tidak relevan.</li>
                 <li><b>Partisipasi:</b> Peran mahasiswa (Ketua, Anggota, Peserta). Kosongkan jika tidak relevan.</li>
-                <li><b>Bobot:</b> Angka poin SKPI yang didapat dari kegiatan ini (misal: 10, 5, 2).</li>
+                <li><b>Bobot:</b> Angka kredit SKPI yang didapat dari kegiatan ini (misal: 10, 5, 2).</li>
               </ul>
             </div>
           </div>

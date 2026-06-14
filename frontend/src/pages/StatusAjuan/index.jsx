@@ -122,7 +122,7 @@ const StatusAjuan = () => {
       nama_kegiatan: item.master_nama_kegiatan || '',
       tingkat: item.tingkat || '',
       partisipasi: item.partisipasi || '',
-      poin: item.poin || 0,
+      poin: item.kredit || 0,
       waktu_pelaksanaan: item.waktu_pelaksanaan || ''
     });
     setFileBaru(null);
@@ -193,7 +193,7 @@ const StatusAjuan = () => {
                     <td className="px-6 py-4 text-center font-medium text-gray-400">{index + 1}</td>
                     <td className="px-6 py-4">
                       <div className="font-bold text-gray-800">{item.judul_kegiatan}</div>
-                      <div className="text-xs text-blue-600 font-semibold mt-1">Poin: {item.poin}</div>
+                      <div className="text-xs text-blue-600 font-semibold mt-1">Kredit: {item.poin}</div>
                     </td>
                     <td className="px-6 py-4 text-center">
                        <StatusBadge status={item.status_validasi} />
@@ -291,9 +291,9 @@ const StatusAjuan = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs font-semibold text-gray-500 uppercase ml-1">Akumulasi Poin</label>
+                  <label className="text-xs font-semibold text-gray-500 uppercase ml-1">Akumulasi Kredit</label>
                   <div className="w-full p-3 bg-blue-50 text-blue-600 rounded-xl font-bold text-sm text-center border border-blue-100">
-                    {formData.poin} PTS
+                    {formData.poin} Kredit
                   </div>
                 </div>
 
@@ -326,8 +326,8 @@ const StatusAjuan = () => {
                   <InfoItem label="Nama Kegiatan" nilai={target.judul_kegiatan} />
                   <InfoItem label="Waktu Pelaksanaan" nilai={target.waktu_pelaksanaan || '-'} />
                   <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
-                    <p className="text-xs font-semibold text-blue-600 uppercase mb-1">Akumulasi Poin</p>
-                    <p className="text-2xl font-bold text-blue-700">{target.poin} <span className="text-sm">PTS</span></p>
+                    <p className="text-xs font-semibold text-blue-600 uppercase mb-1">Akumulasi Kredit</p>
+                    <p className="text-2xl font-bold text-blue-700">{target.poin} <span className="text-sm">Kredit</span></p>
                   </div>
                </div>
                <div className="space-y-6">

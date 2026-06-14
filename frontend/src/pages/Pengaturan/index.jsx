@@ -28,7 +28,7 @@ const Pengaturan = () => {
   const [formProdi, setFormProdi] = useState({ id_prodi: '', nama_prodi: '', jenjang: 'S1', gelar_lulusan: '', masa_studi_tahun: 4 });
 
   // --- STATE AKADEMIK & ANGKATAN ---
-  const [dataPoin, setDataPoin] = useState([]);
+  const [dataKredit, setDataKredit] = useState([]);
   const [daftarAngkatan, setDaftarAngkatan] = useState([]);
   const [inputAngkatan, setInputAngkatan] = useState({ tahun: '', nama_angkatan: '', keterangan: '' });
   const [showEditModal, setShowEditModal] = useState(false);
@@ -67,7 +67,7 @@ const Pengaturan = () => {
     try {
       const res = await fetch('https://skpi-stikomelrahma.my.id/backend/api/admin/kelola_semester.php?aksi=ambil');
       const hasil = await res.json();
-      if (hasil.status === 'sukses') setDataPoin(hasil.data.map(d => ({ sem: d.semester, min: d.target_poin, id: d.id })));
+      if (hasil.status === 'sukses') setDataKredit(hasil.data.map(d => ({ sem: d.semester, min: d.target_poin, id: d.id })));
     } catch (err) { console.error("Gagal ambil data semester"); }
   };
 
@@ -244,21 +244,21 @@ const Pengaturan = () => {
       <div className="min-h-[500px]">
         {tabAktif === 'akademik' && (
           <PanelAkademik
-            dataPoin={dataPoin}
+            dataKredit={dataKredit}
             daftarAngkatan={daftarAngkatan}
             inputAngkatan={inputAngkatan}
             setInputAngkatan={setInputAngkatan}
             bukaEdit={(data) => { setDataEdit(data); setShowEditModal(true); }}
             setDataEdit={setDataEdit}
             setShowEditModal={setShowEditModal}
-            handleUpdateTarget={(id, val) => setDataPoin(dataPoin.map(p => p.id === id ? { ...p, min: parseInt(val) || 0 } : p))}
+            handleUpdateTarget={(id, val) => setDataKredit(dataKredit.map(p => p.id === id ? { ...p, min: parseInt(val) || 0 } : p))}
             handleHapusAngkatan={handleHapusAngkatan}
             onSaveSemester={async () => {
               try {
                 const res = await fetch('https://skpi-stikomelrahma.my.id/backend/api/admin/kelola_semester.php?aksi=update', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(dataPoin.map(p => ({ id: p.id, target_poin: p.min })))
+                  body: JSON.stringify(dataKredit.map(p => ({ id: p.id, target_poin: p.min })))
                 });
                 const h = await res.json();
                 if (h.status === 'sukses') Swal.fire('Tersimpan', '', 'success');
@@ -457,7 +457,7 @@ const TabButton = ({ aktif, onClick, ikon, label }) => (
   </button>
 );
 
-const PanelAkademik = ({ dataPoin, daftarAngkatan, bukaEdit, setDataEdit, setShowEditModal, handleUpdateTarget, handleHapusAngkatan, onSaveSemester }) => (
+const PanelAkademik = ({ dataKredit, daftarAngkatan, bukaEdit, setDataEdit, setShowEditModal, handleUpdateTarget, handleHapusAngkatan, onSaveSemester }) => (
   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
     <div className="bg-white p-8 md:p-10 rounded-[3rem] shadow-sm border border-gray-100 flex flex-col">
       <div className="flex justify-between items-center mb-6">
@@ -479,9 +479,9 @@ const PanelAkademik = ({ dataPoin, daftarAngkatan, bukaEdit, setDataEdit, setSho
       </div>
     </div>
     <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
-      <h4 className="font-black text-blue-900 uppercase italic mb-6 flex items-center gap-3"><ShieldCheck className="text-emerald-500" /> Target Poin UAS</h4>
+      <h4 className="font-black text-blue-900 uppercase italic mb-6 flex items-center gap-3"><ShieldCheck className="text-emerald-500" /> Target Kredit UAS</h4>
       <div className="grid grid-cols-2 gap-4 mb-6">
-        {dataPoin.map((p) => (
+        {dataKredit.map((p) => (
           <div key={p.sem} className="p-4 bg-gray-50 rounded-2xl flex justify-between items-center">
             <span className="font-black text-gray-400 text-[10px] uppercase">Smt {p.sem}</span>
             <input type="number" value={p.min} onChange={(e) => handleUpdateTarget(p.id, e.target.value)} className="w-16 bg-white p-2 rounded-xl text-center font-black text-blue-600 outline-none" />

@@ -16,7 +16,7 @@ const Sidebar = () => {
       '/data-mahasiswa': 'MANAJEMEN MAHASISWA',
       '/validasi-skpi': 'VALIDASI BERKAS SKPI',
       '/kategori': 'MASTER KATEGORI', // Tambahkan ini agar tidak default
-      '/pengaturan': 'KONFIGURASI POIN',
+      '/pengaturan': 'KONFIGURASI KREDIT',
       '/profil': 'PROFIL SAYA',
       '/input-skpi': 'INPUT SERTIFIKAT',
       '/status-ajuan': 'RIWAYAT AJUAN',

@@ -144,7 +144,7 @@ const ValidasiSKPI = () => {
                 <th className="py-4 px-4 text-center w-16">No</th>
                 <th className="py-4 px-4">Pengaju</th>
                 <th className="py-4 px-4">Informasi Kegiatan</th>
-                <th className="py-4 px-4 text-center">Poin</th>
+                <th className="py-4 px-4 text-center">Kredit</th>
                 <th className="py-4 px-4 text-center w-48">Aksi & Validasi</th>
               </tr>
             </thead>
@@ -165,7 +165,7 @@ const ValidasiSKPI = () => {
                     </td>
                     <td className="py-4 px-4 text-center">
                       <span className="inline-flex items-center justify-center bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-xs font-semibold border border-blue-100">
-                        {item.poin} Poin
+                        {item.poin} Kredit
                       </span>
                     </td>
                     <td className="py-4 px-4 text-center">
@@ -249,8 +249,8 @@ const ValidasiSKPI = () => {
                </div>
                <div className="space-y-6 flex flex-col justify-between">
                   <div className="p-5 bg-blue-50 rounded-xl border border-blue-100">
-                    <p className="text-xs font-semibold text-blue-600 uppercase mb-1">Bobot Poin</p>
-                    <p className="text-3xl font-bold text-blue-700">{targetItem.poin} PTS</p>
+                    <p className="text-xs font-semibold text-blue-600 uppercase mb-1">Bobot Kredit</p>
+                    <p className="text-3xl font-bold text-blue-700">{targetItem.poin} Kredit</p>
                   </div>
                   
                   <div className="p-5 border border-gray-200 rounded-xl bg-gray-50">
